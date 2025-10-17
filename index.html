@@ -68,6 +68,57 @@
     </div>
   </section>
 
+  <section id="invitation" class="invitation-section">
+  <h2>💌 Our Wedding Invitation 💌</h2>
+  <p class="subtitle">Click or hover to open our wedding card 💖</p>
+
+  <div class="card-wrapper">
+    <div class="wedding-card" id="weddingCard">
+
+      <!-- FRONT COVER -->
+      <div class="card-face card-cover">
+        <img src="images/page1.jpg" alt="Wedding Card Cover">
+        <div class="swipe-icon">↔️ Swipe to Open</div>
+      </div>
+
+      <!-- INSIDE PAGES -->
+      <div class="card-inner">
+        <div class="card-left">
+          <img src="images/page2.jpg" alt="English Invitation">
+        </div>
+        <div class="card-right">
+          <img src="images/page3.jpg" alt="Telugu Invitation">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  // ✅ Make sure this script is placed AFTER the HTML (before </body>)
+  document.addEventListener("DOMContentLoaded", function () {
+    const weddingCard = document.getElementById("weddingCard");
+    const swipeIcon = document.querySelector(".swipe-icon");
+
+    // Desktop hover effect
+    weddingCard.addEventListener("mouseenter", () => {
+      weddingCard.classList.add("open");
+    });
+    weddingCard.addEventListener("mouseleave", () => {
+      weddingCard.classList.remove("open");
+    });
+
+    // Mobile click/tap toggle
+    swipeIcon.addEventListener("click", (e) => {
+      e.stopPropagation();
+      weddingCard.classList.toggle("open");
+    });
+  });
+</script>
+
+
+
   <!-- RSVP -->
   <section id="rsvp" class="section">
     <h2>RSVP</h2>
@@ -80,5 +131,39 @@
     <p>Made with ❤️ by Venu & Vasavi</p>
     <p>#VVForever | #VVTogether</p>
   </footer>
+
+
+<!-- Countdown Timer -->
+<div id="countdown-box">
+  <h3>💍 Countdown to Our Big Day 💞</h3>
+  <div id="countdown"></div>
+</div>
+
+<script>
+// Target date and time (Nov 1, 2025 10:51 AM IST)
+const targetDate = new Date("Nov 1, 2025 10:51:00 GMT+0530").getTime();
+
+const countdownFunction = setInterval(() => {
+  const now = new Date().getTime();
+  const distance = targetDate - now;
+
+  // Time calculations
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Display
+  document.getElementById("countdown").innerHTML =
+    `<span>${days}d</span> : <span>${hours}h</span> : <span>${minutes}m</span> : <span>${seconds}s</span>`;
+
+  // When the countdown is finished
+  if (distance < 0) {
+    clearInterval(countdownFunction);
+    document.getElementById("countdown").innerHTML = "💖 It's Wedding Time! 💖";
+  }
+}, 1000);
+</script>
+
 </body>
 </html>

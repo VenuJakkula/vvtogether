@@ -107,3 +107,158 @@ footer {
 footer p {
   font-size: 0.9rem;
 }
+
+/* Countdown box styling */
+#countdown-box {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+  color: #fff;
+  padding: 15px 25px;
+  border-radius: 20px;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  z-index: 999;
+  animation: fadeIn 2s ease-in-out;
+}
+
+#countdown-box h3 {
+  font-size: 14px;
+  margin: 0 0 5px 0;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+#countdown {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+#countdown span {
+  background: rgba(255,255,255,0.2);
+  padding: 3px 6px;
+  border-radius: 8px;
+}
+
+/* Subtle entrance animation */
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+
+/* wedding invitation card styling */
+.invitation-section {
+  text-align: center;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #fff0f5, #ffe6eb);
+}
+
+.invitation-section h2 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 40px;
+  color: #c2185b;
+  margin-bottom: 10px;
+}
+
+.invitation-section .subtitle {
+  color: #555;
+  margin-bottom: 40px;
+}
+
+/* 3D Wrapper */
+.card-wrapper {
+  perspective: 2000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Wedding Card Container */
+.wedding-card {
+  position: relative;
+  width: 700px;
+  height: 500px;  /* ✅ Increased height so page 1 fits fully */
+  transform-style: preserve-3d;
+  transition: transform 1.5s ease-in-out;
+}
+
+/* Cover (Page 1) */
+.card-face.card-cover {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  transform-origin: left;
+  z-index: 2;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  overflow: hidden;
+  transition: transform 1.5s ease-in-out;
+}
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Swipe hint */
+.swipe-icon {
+  position: absolute;
+  bottom: 20px;
+  right: 25px;
+  background: rgba(255,255,255,0.9);
+  color: #c2185b;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  animation: swipeHint 1.3s infinite alternate;
+  z-index: 3;
+  cursor: pointer;
+}
+
+@keyframes swipeHint {
+  from { transform: translateX(0); }
+  to { transform: translateX(-10px); }
+}
+
+/* Inside Pages (2 & 3) */
+.card-inner {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.card-left, .card-right {
+  width: 50%;
+  height: 100%;
+}
+
+.card-left img, .card-right img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: none; /* fix mirroring */
+}
+
+/* When opened */
+.wedding-card.open .card-cover {
+  transform: rotateY(-180deg);
+  z-index: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .wedding-card {
+    width: 95%;
+    height: 380px;
+  }
+  .swipe-icon { font-size: 12px; right: 15px; bottom: 15px; }
+}
