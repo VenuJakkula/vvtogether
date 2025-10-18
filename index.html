@@ -291,37 +291,114 @@ musicBtn.addEventListener('click', () => {
   </footer>
 
 
-<!-- Countdown Timer -->
+<!-- 💍 Mini Countdown Timer -->
 <div id="countdown-box">
-  <h3>💍 Countdown to Our Big Day 💞</h3>
+  <span id="close-countdown">❌</span>
+  <h4>💞 Wedding Countdown 💞</h4>
   <div id="countdown"></div>
 </div>
 
+<style>
+/* --- Countdown Box Styling --- */
+#countdown-box {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  background: rgba(255, 240, 245, 0.95);
+  border: 1px solid #e89db0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  z-index: 9999;
+  max-width: 180px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+#countdown-box h4 {
+  margin: 0 0 4px 0;
+  color: #c2185b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+#countdown {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+#countdown span {
+  color: #c2185b;
+  font-weight: 600;
+}
+
+/* ❌ Close Button */
+#close-countdown {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #c2185b;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  line-height: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#close-countdown:hover {
+  background: #a2154f;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #countdown-box {
+    bottom: 10px;
+    left: 10px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+</style>
+
 <script>
-// Target date and time (Nov 1, 2025 10:51 AM IST)
+// 🎯 Target date and time
 const targetDate = new Date("Nov 1, 2025 10:51:00 GMT+0530").getTime();
 
 const countdownFunction = setInterval(() => {
   const now = new Date().getTime();
   const distance = targetDate - now;
 
-  // Time calculations
   const days = Math.floor(distance / (1000 * 60 * 60 * 24));
   const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-  // Display
   document.getElementById("countdown").innerHTML =
     `<span>${days}d</span> : <span>${hours}h</span> : <span>${minutes}m</span> : <span>${seconds}s</span>`;
 
-  // When the countdown is finished
   if (distance < 0) {
     clearInterval(countdownFunction);
     document.getElementById("countdown").innerHTML = "💖 It's Wedding Time! 💖";
   }
 }, 1000);
+
+// ❌ Close button hide action
+document.getElementById("close-countdown").addEventListener("click", () => {
+  const box = document.getElementById("countdown-box");
+  box.style.opacity = "0";
+  box.style.transform = "scale(0.8)";
+  setTimeout(() => box.style.display = "none", 400);
+});
 </script>
+
+
 
 </body>
 </html>
