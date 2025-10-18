@@ -69,7 +69,7 @@
   </section>
 
   <section id="invitation" class="invitation-section">
-  <h2>💌 Our Wedding Invitation 💌</h2>
+  <h2>💌 Wedding Invitation 💌</h2>
   <p class="subtitle">Click or hover to open our wedding card 💖</p>
 
   <div class="card-wrapper">
@@ -99,6 +99,57 @@
   // ✅ Make sure this script is placed AFTER the HTML (before </body>)
   document.addEventListener("DOMContentLoaded", function () {
     const weddingCard = document.getElementById("weddingCard");
+    const swipeIcon = document.querySelector(".swipe-icon");
+
+    // Desktop hover effect
+    weddingCard.addEventListener("mouseenter", () => {
+      weddingCard.classList.add("open");
+    });
+    weddingCard.addEventListener("mouseleave", () => {
+      weddingCard.classList.remove("open");
+    });
+
+    // Mobile click/tap toggle
+    swipeIcon.addEventListener("click", (e) => {
+      e.stopPropagation();
+      weddingCard.classList.toggle("open");
+    });
+  });
+</script>
+
+<!-- Bride's Invitation Card Section -->
+
+<section id="invitation" class="invitation-section">
+  <h2>💌 Brides Wedding Invitation 💌</h2>
+  <p class="subtitle">Click or hover to open our wedding card 💖</p>
+
+  <div class="card-wrapper">
+    <div class="wedding-card" id="brides_weddingCard">
+
+      <!-- FRONT COVER -->
+      <div class="card-face card-cover">
+        <img src="images/bride_invite1.jpg" alt="Wedding Card Cover">
+        <div class="swipe-icon">↔️ Swipe to Open</div>
+      </div>
+
+      <!-- INSIDE PAGES -->
+      <div class="card-inner">
+        <div class="card-left">
+          <img src="images/bride_invite2.jpg" alt="English Invitation">
+        </div>
+        <div class="card-right">
+          <img src="images/bride_invite3.jpg" alt="Telugu Invitation">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+  // ✅ Make sure this script is placed AFTER the HTML (before </body>)
+  document.addEventListener("DOMContentLoaded", function () {
+    const weddingCard = document.getElementById("brides_weddingCard");
     const swipeIcon = document.querySelector(".swipe-icon");
 
     // Desktop hover effect
@@ -275,8 +326,6 @@ musicBtn.addEventListener('click', () => {
 });
 </script>
 
-
-
   <!-- RSVP -->
   <section id="rsvp" class="section">
     <h2>RSVP</h2>
@@ -288,6 +337,7 @@ musicBtn.addEventListener('click', () => {
   <footer>
     <p>Made with ❤️ by Venu & Vasavi</p>
     <p>#VVForever | #VVTogether</p>
+    <p align="right">Developed by Venu Kumar</p>
   </footer>
 
 
