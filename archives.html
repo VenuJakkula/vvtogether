@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Venu ❤️ Vasavi | Wedding Archives</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">🏠 Home</a>
+      <div class="nav-menu">
+        <a href="archives.html" class="nav-link active">Wedding Archives</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Full-length top video banner (100vh) -->
+  <section class="video-banner">
+    <video class="video-banner__media" playsinline autoplay muted loop poster="images/video-poster.jpg">
+      <source src="videos/bg.mp4" type="video/mp4">
+      Your browser does not support the video tag. You can <a href="videos/full-banner.mp4">download the video</a> instead.
+    </video>
+    <!-- Banner audio toggle (user can unmute) -->
+    <button id="banner-audio-toggle" class="banner-audio-btn" aria-pressed="false" aria-label="Toggle banner audio">🔈 Unmute</button>
+  </section>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <br>
+      <br>
+      <br>
+      <br>
+      <h1>Venu ❤️ Vasavi</h1>
+      <p class="date">November 1, 2025</p>
+      <p class="tagline">#VVForever | #VVTogether</p>
+      <a href="#details" class="btn">View Wedding Details</a>
+    </div>
+  </header>
+
+  <!-- Our Story -->
+  <section id="story" class="section">
+    <h2>Our Story</h2>
+    <p>
+      It all began with a smile — and soon turned into a lifetime bond. I, a data scientist, and she, excelling as Assistant Grade-III Technical at FCI, both passionate and dedicated in our careers, found a connection through our shared drive and independence. From endless talks to shared dreams, our journey has been filled with love, laughter, and blessings. As we take the next step together, we'd love for you to join our special day! 
+    </p>
+  </section>
+
+  <!-- Event Details -->
+  <section id="details" class="section alt">
+    <h2>Wedding Details</h2>
+    <div class="events">
+      <div class="event">
+        <h3>💍 Wedding</h3>
+        <p><b>Date:</b> November 1, 2025</p>
+        <p><b>Venue:</b> Sri Tirumala gardens, Malkajgiri</p>
+        <p><b>Time:</b> 10:51 AM</p>
+        <div class="map-container">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m19!1m8!1m3!1d2230.961063195287!2d78.53463320411139!3d17.445765483385667!3m2!1i1024!2i768!4f13.1!4m8!3e0!4m0!4m5!1s0x3bcb9bc48b89e059%3A0xcd764f1defc49533!2sTirumala%20Gardens%2C%20Malkajgiri%20Rd%2C%20South%20Venkateshwara%20Nagar%2C%20PVN%20Colony%2C%20Malkajgiri%2C%20Secunderabad%2C%20Telangana%20500047!3m2!1d17.4454189!2d78.5371734!5e1!3m2!1sen!2sin!4v1760635925384!5m2!1sen!2sin" width="200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+      <div class="event">
+        <h3>🎉 Reception</h3>
+        <p><b>Date:</b> November 2, 2025</p>
+        <p><b>Venue:</b> Venu's Residence, Siddipet</p>
+        <p><b>Theme:</b> Elegant Evening</p>
+        <div class="map-container">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d19397.982413959184!2d78.87022228289244!3d18.045247429700577!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcc93002a338faf%3A0x2a29fffb97d854f3!2sVenkanna%20Farm%20house!5e1!3m2!1sen!2sin!4v1760636135577!5m2!1sen!2sin" width="200"  style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Groom's Invitation Card -->
+  <section id="invitation" class="invitation-section">
+    <h2>💌 Wedding Invitation 💌</h2>
+    <p class="subtitle">Click or hover to open our wedding card 💖</p>
+
+    <div class="card-wrapper">
+      <div class="wedding-card" id="weddingCard">
+        <div class="card-face card-cover">
+          <img src="images/page1.jpg" alt="Wedding Card Cover">
+          <div class="swipe-icon">↔️ Swipe to Open</div>
+        </div>
+        <div class="card-inner">
+          <div class="card-left">
+            <img src="images/page2.jpg" alt="English Invitation">
+          </div>
+          <div class="card-right">
+            <img src="images/page3.jpg" alt="Telugu Invitation">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const weddingCard = document.getElementById("weddingCard");
+      const swipeIcon = document.querySelector(".swipe-icon");
+      weddingCard.addEventListener("mouseenter", () => {
+        weddingCard.classList.add("open");
+      });
+      weddingCard.addEventListener("mouseleave", () => {
+        weddingCard.classList.remove("open");
+      });
+      swipeIcon.addEventListener("click", (e) => {
+        e.stopPropagation();
+        weddingCard.classList.toggle("open");
+      });
+    });
+  </script>
+
+  <!-- Bride's Invitation Card Section -->
+  <section id="invitation" class="invitation-section">
+    <h2>💌 Bride's Wedding Invitation 💌</h2>
+    <p class="subtitle">Click or hover to open the wedding card 💖</p>
+
+    <div class="card-wrapper">
+      <div class="wedding-card" id="brides_weddingCard">
+        <div class="card-face card-cover">
+          <img src="images/bride_invite1.jpg" alt="Wedding Card Cover">
+          <div class="swipe-icon">↔️ Swipe to Open</div>
+        </div>
+        <div class="card-inner">
+          <div class="card-left">
+            <img src="images/bride_invite2.jpg" alt="English Invitation">
+          </div>
+          <div class="card-right">
+            <img src="images/bride_invite3.jpg" alt="Telugu Invitation">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const weddingCard = document.getElementById("brides_weddingCard");
+      const swipeIcon = document.querySelectorAll(".swipe-icon")[1];
+      weddingCard.addEventListener("mouseenter", () => {
+        weddingCard.classList.add("open");
+      });
+      weddingCard.addEventListener("mouseleave", () => {
+        weddingCard.classList.remove("open");
+      });
+      swipeIcon.addEventListener("click", (e) => {
+        e.stopPropagation();
+        weddingCard.classList.toggle("open");
+      });
+    });
+  </script>
+
+  <!-- Banner audio toggle script -->
+  <script>
+    (function(){
+      const btn = document.getElementById('banner-audio-toggle');
+      const video = document.querySelector('.video-banner__media');
+      if (!btn || !video) return;
+      function update() {
+        const unmuted = !video.muted;
+        btn.setAttribute('aria-pressed', String(unmuted));
+        btn.textContent = unmuted ? '🔊 Mute' : '🔈 Unmute';
+      }
+      video.muted = true;
+      update();
+      btn.addEventListener('click', async () => {
+        try {
+          video.muted = !video.muted;
+          if (!video.muted) await video.play();
+        } catch (e) {
+          // play may be blocked until a user gesture; ignore
+        }
+        update();
+      });
+    })();
+  </script>
+
+  <!-- 💕 Family Photo Heart Reveal -->
+  <section class="family-reveal-section">
+    <h2>💕 Our Family 💕</h2>
+    <p class="subtitle">Drag the heart to reveal our family photo. Use the slider to resize! ✨</p>
+
+    <div class="reveal-container" id="revealContainer">
+      <!-- The family photo underneath -->
+      <img src="photos/family_photo.jpeg" alt="Family Photo" class="reveal-photo" draggable="false" />
+      <!-- Color overlay with heart-shaped hole -->
+      <svg class="reveal-overlay" id="revealOverlay" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <mask id="heartMask">
+            <!-- White = visible overlay (colored), Black = transparent hole -->
+            <rect width="100%" height="100%" fill="white" />
+            <path id="heartPath" fill="black"
+              d="M0,-35 C0,-55 -25,-55 -25,-35 C-25,-20 0,0 0,15 C0,0 25,-20 25,-35 C25,-55 0,-55 0,-35 Z"
+              transform="translate(500,350) scale(3)" />
+          </mask>
+        </defs>
+        <!-- Gradient overlay that hides the photo -->
+        <rect width="100%" height="100%" fill="url(#overlayGradient)" mask="url(#heartMask)" />
+        <defs>
+          <linearGradient id="overlayGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#764ba2;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#667eea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#e0c3fc;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <!-- Heart outline indicator -->
+      <div class="heart-indicator" id="heartIndicator">❤️</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="reveal-controls">
+      <div class="control-group">
+        <label for="heartSize">💗 Heart Size</label>
+        <input type="range" id="heartSize" min="1" max="15" value="3" step="0.5" />
+      </div>
+      <button class="reveal-btn" id="revealAllBtn">✨ Reveal Full Photo</button>
+      <button class="reveal-btn reveal-btn-reset" id="resetBtn">🔄 Reset</button>
+    </div>
+  </section>
+
+  <style>
+    /* ===== FAMILY PHOTO HEART REVEAL ===== */
+    .family-reveal-section {
+      padding: 80px 20px;
+      background: linear-gradient(135deg, rgba(224, 195, 252, 0.9) 0%, rgba(142, 197, 252, 0.9) 100%);
+      text-align: center;
+    }
+
+    .family-reveal-section h2 {
+      font-size: 2.5rem;
+      font-family: 'Playfair Display', serif;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .family-reveal-section .subtitle {
+      color: #555;
+      margin-bottom: 30px;
+      font-size: 1rem;
+    }
+
+    .reveal-container {
+      position: relative;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      aspect-ratio: 10 / 7;
+      border: 3px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .reveal-container:active {
+      cursor: grabbing;
+    }
+
+    .reveal-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .reveal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .reveal-overlay.hidden {
+      opacity: 0;
+    }
+
+    .heart-indicator {
+      position: absolute;
+      font-size: 2.5rem;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+      transition: font-size 0.2s ease;
+      z-index: 5;
+    }
+
+    /* Controls */
+    .reveal-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .control-group label {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .control-group input[type="range"] {
+      width: 120px;
+      accent-color: #764ba2;
+      cursor: pointer;
+    }
+
+    .reveal-btn {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #333;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .reveal-btn:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .reveal-btn-reset {
+      background: rgba(118, 75, 162, 0.2);
+    }
+
+    @media (max-width: 600px) {
+      .family-reveal-section h2 {
+        font-size: 1.8rem;
+      }
+
+      .reveal-controls {
+        gap: 10px;
+      }
+
+      .control-group {
+        padding: 8px 14px;
+      }
+
+      .control-group input[type="range"] {
+        width: 80px;
+      }
+
+      .reveal-btn {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+      }
+
+      .heart-indicator {
+        font-size: 2rem;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      const container = document.getElementById('revealContainer');
+      const overlay = document.getElementById('revealOverlay');
+      const heartPath = document.getElementById('heartPath');
+      const heartIndicator = document.getElementById('heartIndicator');
+      const sizeSlider = document.getElementById('heartSize');
+      const revealAllBtn = document.getElementById('revealAllBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      let heartX = 500, heartY = 350, heartScale = 3;
+      let isDragging = false;
+      let isRevealed = false;
+
+      function updateHeart() {
+        heartPath.setAttribute('transform', `translate(${heartX},${heartY}) scale(${heartScale})`);
+        // Position the emoji indicator
+        const rect = container.getBoundingClientRect();
+        const svgW = 1000, svgH = 700;
+        const pxX = (heartX / svgW) * rect.width;
+        const pxY = (heartY / svgH) * rect.height;
+        heartIndicator.style.left = pxX + 'px';
+        heartIndicator.style.top = pxY + 'px';
+        heartIndicator.style.fontSize = Math.max(1.5, heartScale * 0.8) + 'rem';
+      }
+
+      function getPosition(e) {
+        const rect = container.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
+        // Convert pixel position to SVG coordinates (viewBox 1000x700)
+        const svgX = ((clientX - rect.left) / rect.width) * 1000;
+        const svgY = ((clientY - rect.top) / rect.height) * 700;
+        return { x: Math.max(0, Math.min(1000, svgX)), y: Math.max(0, Math.min(700, svgY)) };
+      }
+
+      function onStart(e) {
+        if (isRevealed) return;
+        isDragging = true;
+        const pos = getPosition(e);
+        heartX = pos.x;
+        heartY = pos.y;
+        updateHeart();
+        e.preventDefault();
+      }
+
+      function onMove(e) {
+        if (!isDragging || isRevealed) return;
+        const pos = getPosition(e);
+        heartX = pos.x;
+        heartY = pos.y;
+        updateHeart();
+        e.preventDefault();
+      }
+
+      function onEnd() {
+        isDragging = false;
+      }
+
+      // Mouse events
+      container.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+      // Touch events
+      container.addEventListener('touchstart', onStart, { passive: false });
+      window.addEventListener('touchmove', onMove, { passive: false });
+      window.addEventListener('touchend', onEnd);
+
+      // Size slider
+      sizeSlider.addEventListener('input', function() {
+        heartScale = parseFloat(this.value);
+        updateHeart();
+      });
+
+      // Reveal all
+      revealAllBtn.addEventListener('click', function() {
+        isRevealed = true;
+        overlay.classList.add('hidden');
+        heartIndicator.style.display = 'none';
+        this.textContent = '🎉 Photo Revealed!';
+        this.style.background = 'rgba(118, 75, 162, 0.3)';
+      });
+
+      // Reset
+      resetBtn.addEventListener('click', function() {
+        isRevealed = false;
+        overlay.classList.remove('hidden');
+        heartIndicator.style.display = 'block';
+        heartX = 500; heartY = 350; heartScale = 3;
+        sizeSlider.value = 3;
+        updateHeart();
+        revealAllBtn.textContent = '✨ Reveal Full Photo';
+        revealAllBtn.style.background = '';
+      });
+
+      // Initial position
+      updateHeart();
+    })();
+  </script>
+
+  <!-- 🌸 Engagement Gallery Section -->
+  <section id="engagement-gallery" class="gallery-section">
+    <h2>💍 Our Engagement Moments 💍</h2>
+    <p class="subtitle">A glimpse of our beautiful journey together ✨</p>
+
+    <div class="music-toggle">
+      <audio id="bg-music" loop>
+        <source src="music/wedding-song.mp3" type="audio/mp3">
+      </audio>
+      <button id="music-btn" class="music-btn">🎵 Play Music</button>
+    </div>
+
+    <div class="gallery">
+      <a href="photos/photo1.jpg" data-lightbox="engagement" data-title="Engagement Photo 1">
+        <img src="photos/photo1.jpg" alt="Engagement Photo 1">
+      </a>
+      <a href="photos/photo2.jpg" data-lightbox="engagement" data-title="Engagement Photo 2">
+        <img src="photos/photo2.jpg" alt="Engagement Photo 2">
+      </a>
+      <a href="photos/photo3.jpg" data-lightbox="engagement" data-title="Engagement Photo 3">
+        <img src="photos/photo3.jpg" alt="Engagement Photo 3">
+      </a>
+      <a href="photos/photo4.jpg" data-lightbox="engagement" data-title="Engagement Photo 4">
+        <img src="photos/photo4.jpg" alt="Engagement Photo 4">
+      </a>
+      <a href="photos/photo5.jpg" data-lightbox="engagement" data-title="Engagement Photo 5">
+        <img src="photos/photo5.jpg" alt="Engagement Photo 5">
+      </a>
+      <a href="photos/photo6.jpg" data-lightbox="engagement" data-title="Engagement Photo 6">
+        <img src="photos/photo6.jpg" alt="Engagement Photo 6">
+      </a>
+      <a href="photos/photo7.jpg" data-lightbox="engagement" data-title="Engagement Photo 7">
+        <img src="photos/photo7.jpg" alt="Engagement Photo 7">
+      </a>
+      <a href="photos/photo8.jpg" data-lightbox="engagement" data-title="Engagement Photo 8">
+        <img src="photos/photo8.jpg" alt="Engagement Photo 8">
+      </a>
+      <a href="photos/photo9.jpg" data-lightbox="engagement" data-title="Engagement Photo 9">
+        <img src="photos/photo9.jpg" alt="Engagement Photo 9">
+      </a>
+      <a href="photos/photo10.jpg" data-lightbox="engagement" data-title="Engagement Photo 10">
+        <img src="photos/photo10.jpg" alt="Engagement Photo 10">
+      </a>
+      <a href="photos/photo11.jpg" data-lightbox="engagement" data-title="Engagement Photo 11">
+        <img src="photos/photo11.jpg" alt="Engagement Photo 11">
+      </a>
+      <a href="photos/photo12.jpg" data-lightbox="engagement" data-title="Engagement Photo 12">
+        <img src="photos/photo12.jpg" alt="Engagement Photo 12">
+      </a>
+    </div>
+  </section>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+  <script>
+    const music = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-btn');
+    let isPlaying = false;
+    musicBtn.addEventListener('click', () => {
+      if (!isPlaying) {
+        music.play();
+        isPlaying = true;
+        musicBtn.textContent = '⏸️ Pause Music';
+      } else {
+        music.pause();
+        isPlaying = false;
+        musicBtn.textContent = '🎵 Play Music';
+      }
+    });
+  </script>
+
+  <!-- RSVP -->
+  <section id="rsvp" class="section">
+    <h2>RSVP</h2>
+    <p>We can't wait to celebrate with you! Kindly confirm your presence.</p>
+    <a href="mailto:venujkvenk@gmail.com?subject=Wedding RSVP - Venu & Vasavi" class="btn">Send Your RSVP</a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>Made with ❤️ by Venu & Vasavi</p>
+    <p>#VVForever | #VVTogether</p>
+    <p align="right">Developed by Venu Kumar</p>
+  </footer>
+
+  <!-- 💍 Mini Countdown Timer -->
+  <div id="countdown-box">
+    <span id="close-countdown">❌</span>
+    <h4>💞 Wedding Memories 💞</h4>
+    <p style="font-size: 12px; margin: 5px 0 0 0;">November 1, 2025</p>
+  </div>
+
+</body>
+</html>
