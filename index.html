@@ -85,6 +85,21 @@
       <div id="baby-countdown" class="countdown-timer">
         <div class="countdown-item">
           <span id="months" class="countdown-value">0</span>
+<<<<<<< HEAD
+          <span id="monthsLabel" class="countdown-label">Months</span>
+        </div>
+        <div class="countdown-item">
+          <span id="days" class="countdown-value">0</span>
+          <span id="daysLabel" class="countdown-label">Days</span>
+        </div>
+        <div class="countdown-item">
+          <span id="hours" class="countdown-value">0</span>
+          <span id="hoursLabel" class="countdown-label">Hours</span>
+        </div>
+        <div class="countdown-item">
+          <span id="minutes" class="countdown-value">0</span>
+          <span id="minutesLabel" class="countdown-label">Minutes</span>
+=======
           <span class="countdown-label">Months</span>
         </div>
         <div class="countdown-item">
@@ -98,6 +113,7 @@
         <div class="countdown-item">
           <span id="minutes" class="countdown-value">0</span>
           <span class="countdown-label">Minutes</span>
+>>>>>>> dde75ab3a6a57e428b8115731c4c592f361f630d
         </div>
       </div>
     </div>
@@ -119,7 +135,11 @@
 
   <!-- Baby Facts Section -->
   <section class="baby-facts-section">
+<<<<<<< HEAD
+    <div class="section-icon animated-pulse">✨</div>
+=======
     <div class="section-icon animated-spin">✨</div>
+>>>>>>> dde75ab3a6a57e428b8115731c4c592f361f630d
     <h2>What to Expect in October 2026</h2>
     <div class="facts-grid">
       <div class="fact-card">
@@ -298,6 +318,88 @@
       document.getElementById('days').textContent = days;
       document.getElementById('hours').textContent = hours;
       document.getElementById('minutes').textContent = minutes;
+<<<<<<< HEAD
+
+      document.getElementById('monthsLabel').textContent = months === 1 ? 'Month' : 'Months';
+      document.getElementById('daysLabel').textContent = days === 1 ? 'Day' : 'Days';
+      document.getElementById('hoursLabel').textContent = hours === 1 ? 'Hour' : 'Hours';
+      document.getElementById('minutesLabel').textContent = minutes === 1 ? 'Minute' : 'Minutes';
+    }
+
+    // Initial call
+    updateBabyCountdown();
+
+    // Update every minute
+    setInterval(updateBabyCountdown, 60000);
+
+    // Enhanced Navbar Scroll Effect with Liquid Glass
+    const navbar = document.querySelector('.navbar');
+    let scrollThreshold = 50;
+
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > scrollThreshold) {
+        // When scrolled down - enhance the glass effect
+        navbar.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%)';
+        navbar.style.backdropFilter = 'blur(20px)';
+        navbar.style.boxShadow = '0 15px 40px rgba(31, 38, 135, 0.3)';
+        navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.35)';
+      } else {
+        // When at top - lighter glass effect
+        navbar.style.background = 'linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%)';
+        navbar.style.backdropFilter = 'blur(15px)';
+        navbar.style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.2)';
+        navbar.style.borderBottom = '1px solid rgba(255, 255, 255, 0.25)';
+      }
+    });
+
+    // 💕 Family Photo Heart Reveal Interactive Feature
+    (function() {
+      const container = document.getElementById('revealContainer');
+      const overlay = document.getElementById('revealOverlay');
+      const heartPath = document.getElementById('heartPath');
+      const heartIndicator = document.getElementById('heartIndicator');
+      const sizeSlider = document.getElementById('heartSize');
+      const revealAllBtn = document.getElementById('revealAllBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      let heartX = 600, heartY = 320, heartScale = 4.5;
+      let isDragging = false;
+      let isRevealed = false;
+
+      function updateHeart() {
+        heartPath.setAttribute('transform', `translate(${heartX},${heartY}) scale(${heartScale})`);
+        // Position the emoji indicator
+        const rect = container.getBoundingClientRect();
+        const svgW = 1000, svgH = 700;
+        const pxX = (heartX / svgW) * rect.width;
+        // The path origin is at the heart's upper notch. Offset to its visual centre.
+        const heartCentreY = heartY - (heartScale * 20);
+        const pxY = (heartCentreY / svgH) * rect.height;
+        heartIndicator.style.left = pxX + 'px';
+        heartIndicator.style.top = pxY + 'px';
+        heartIndicator.style.fontSize = Math.max(1.5, heartScale * 0.8) + 'rem';
+      }
+
+      function getPosition(e) {
+        const rect = container.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
+        // Convert pixel position to SVG coordinates (viewBox 1000x700)
+        const svgX = ((clientX - rect.left) / rect.width) * 1000;
+        const svgY = ((clientY - rect.top) / rect.height) * 700;
+        return { x: Math.max(0, Math.min(1000, svgX)), y: Math.max(0, Math.min(700, svgY)) };
+      }
+
+      function onStart(e) {
+        if (isRevealed) return;
+        isDragging = true;
+=======
     }
 
     // Initial call
@@ -380,6 +482,17 @@
 
       function onMove(e) {
         if (!isDragging || isRevealed) return;
+>>>>>>> dde75ab3a6a57e428b8115731c4c592f361f630d
+        const pos = getPosition(e);
+        heartX = pos.x;
+        heartY = pos.y;
+        updateHeart();
+        e.preventDefault();
+      }
+
+<<<<<<< HEAD
+      function onMove(e) {
+        if (!isDragging || isRevealed) return;
         const pos = getPosition(e);
         heartX = pos.x;
         heartY = pos.y;
@@ -396,6 +509,17 @@
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onEnd);
 
+=======
+      function onEnd() {
+        isDragging = false;
+      }
+
+      // Mouse events
+      container.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+>>>>>>> dde75ab3a6a57e428b8115731c4c592f361f630d
       // Touch events
       container.addEventListener('touchstart', onStart, { passive: false });
       window.addEventListener('touchmove', onMove, { passive: false });
