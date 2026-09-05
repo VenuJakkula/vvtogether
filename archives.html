@@ -21,9 +21,9 @@
 
   <!-- Full-length top video banner (100vh) -->
   <section class="video-banner">
-    <video class="video-banner__media" playsinline autoplay muted loop poster="images/video-poster.jpg">
+    <video class="video-banner__media" playsinline autoplay muted loop poster="images/hero.JPG">
       <source src="videos/bg.mp4" type="video/mp4">
-      Your browser does not support the video tag. You can <a href="videos/full-banner.mp4">download the video</a> instead.
+      Your browser does not support the video tag. You can <a href="videos/bg.mp4">download the video</a> instead.
     </video>
     <!-- Banner audio toggle (user can unmute) -->
     <button id="banner-audio-toggle" class="banner-audio-btn" aria-pressed="false" aria-label="Toggle banner audio">🔈 Unmute</button>
@@ -43,6 +43,37 @@
       <a href="#details" class="btn">View Wedding Details</a>
     </div>
   </header>
+
+  <section id="memory-calendar" class="memory-calendar" aria-labelledby="calendar-title">
+    <div class="calendar-intro">
+      <p class="calendar-kicker">Our first year together</p>
+      <h2 id="calendar-title">A year of us</h2>
+      <p>From our wedding day onward, every highlighted date holds a little piece of our story. Select a day to revisit its memory.</p>
+    </div>
+
+    <div class="calendar-shell">
+      <div class="calendar-toolbar">
+        <button class="calendar-control" id="previous-month" type="button" aria-label="Show previous month">&#8592;</button>
+        <div>
+          <p class="calendar-range">November 2025 &ndash; October 2026</p>
+          <h3 id="calendar-month" aria-live="polite"></h3>
+        </div>
+        <button class="calendar-control" id="next-month" type="button" aria-label="Show next month">&#8594;</button>
+      </div>
+      <div class="calendar-weekdays" aria-hidden="true">
+        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
+      <div id="calendar-days" class="calendar-days" role="grid" aria-labelledby="calendar-month"></div>
+      <div id="memory-card" class="memory-card" aria-live="polite">
+        <span class="memory-card__icon">&#10084;&#65039;</span>
+        <div>
+          <p class="memory-card__eyebrow">Choose a highlighted date</p>
+          <p class="memory-card__text">Your wedding memories will appear here.</p>
+        </div>
+      </div>
+    </div>
+    <p class="calendar-note">The calendar begins on your wedding weekend. Add more moments to the event list whenever you would like.</p>
+  </section>
 
   <!-- Our Story -->
   <section id="story" class="section">
@@ -585,6 +616,95 @@
     <h4>💞 Wedding Memories 💞</h4>
     <p style="font-size: 12px; margin: 5px 0 0 0;">November 1, 2025</p>
   </div>
+
+  <script>
+    (() => {
+      // Add future memories here: 'YYYY-MM-DD': { title, description, icon }
+      const memories = {
+        '2025-11-01': {
+          title: 'Wedding day',
+          description: 'We said "I do" at Sri Tirumala Gardens, Malkajgiri.',
+          icon: '&#128141;'
+        },
+        '2025-11-02': {
+          title: 'Reception',
+          description: 'An elegant evening celebration with our loved ones in Siddipet.',
+          icon: '&#127881;'
+        }
+      };
+
+      const firstMonth = new Date(2025, 10, 1);
+      const lastMonth = new Date(2026, 9, 1);
+      let visibleMonth = new Date(firstMonth);
+      let selectedKey = null;
+      const monthLabel = document.getElementById('calendar-month');
+      const days = document.getElementById('calendar-days');
+      const memoryCard = document.getElementById('memory-card');
+      const previous = document.getElementById('previous-month');
+      const next = document.getElementById('next-month');
+      const formatMonth = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' });
+      const formatDate = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+      function keyFor(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      }
+
+      function showMemory(key) {
+        const memory = memories[key];
+        if (!memory) return;
+        selectedKey = key;
+        const date = new Date(`${key}T12:00:00`);
+        memoryCard.innerHTML = `<span class="memory-card__icon">${memory.icon}</span><div><p class="memory-card__eyebrow">${formatDate.format(date)}</p><p class="memory-card__text"><strong>${memory.title}</strong> &mdash; ${memory.description}</p></div>`;
+        render();
+      }
+
+      function render() {
+        monthLabel.textContent = formatMonth.format(visibleMonth);
+        days.innerHTML = '';
+        const year = visibleMonth.getFullYear();
+        const month = visibleMonth.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let index = 0; index < firstDay; index += 1) {
+          const blank = document.createElement('span');
+          blank.className = 'calendar-day calendar-day--blank';
+          days.appendChild(blank);
+        }
+
+        for (let day = 1; day <= totalDays; day += 1) {
+          const date = new Date(year, month, day);
+          const key = keyFor(date);
+          const memory = memories[key];
+          const cell = document.createElement(memory ? 'button' : 'span');
+          cell.className = `calendar-day${memory ? ' calendar-day--event' : ''}${key === selectedKey ? ' calendar-day--selected' : ''}`;
+          cell.textContent = day;
+          if (memory) {
+            cell.type = 'button';
+            cell.title = memory.title;
+            cell.setAttribute('aria-label', `${formatDate.format(date)}: ${memory.title}`);
+            cell.addEventListener('click', () => showMemory(key));
+          }
+          days.appendChild(cell);
+        }
+
+        previous.disabled = visibleMonth.getTime() === firstMonth.getTime();
+        next.disabled = visibleMonth.getTime() === lastMonth.getTime();
+      }
+
+      previous.addEventListener('click', () => {
+        visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1);
+        render();
+      });
+      next.addEventListener('click', () => {
+        visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1);
+        render();
+      });
+
+      render();
+      showMemory('2025-11-01');
+    })();
+  </script>
 
 </body>
 </html>
