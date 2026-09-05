@@ -6,6 +6,210 @@
   <title>Venu &amp; Vasavi | Albums</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!--
+    DESIGN NOTES — kept here since this page's gallery styling is new and
+    specific to it (the rest of the site keeps feature CSS inline too, see
+    the family-photo-reveal block in archives.html).
+
+    This reuses the palette this page already established rather than
+    introducing a new one:
+      --album-ink     #3f294e  (headings, already used by .album-viewer-heading h2)
+      --album-accent  #6d3f98  (already the active-tab gradient start)
+      --album-accent2 #8e5cba  (already the active-tab gradient end)
+      --album-muted   #806b89  (already .album-scroll-hint)
+      --album-lilac   #f1eaf7  (already .album-tabs background)
+      --album-paper   #fffdfb  (new: the "photo mat" — kept near-white so
+                                 photos read true, rather than tinted lilac)
+    Type stays Playfair Display (already loaded on this page, used for the
+    "Photo book" heading) for the counter caption, Poppins for controls —
+    no new fonts added.
+  -->
+  <style>
+    :root{
+      --album-ink:#3f294e;
+      --album-accent:#6d3f98;
+      --album-accent2:#8e5cba;
+      --album-muted:#806b89;
+      --album-lilac:#f1eaf7;
+      --album-paper:#fffdfb;
+      --album-shadow: 0 26px 60px -18px rgba(68,37,94,0.32), 0 8px 22px -10px rgba(68,37,94,0.2);
+    }
+
+    /* ---------- gallery shell ---------- */
+    .album-gallery{
+      margin-top:6px;
+    }
+
+    .album-gallery__stage{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:4px clamp(6px, 4vw, 56px);
+    }
+
+    .album-gallery__nav{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      z-index:5;
+      width:44px; height:44px;
+      border-radius:50%;
+      border:1px solid rgba(109,63,152,0.18);
+      background:rgba(255,255,255,0.85);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      color:var(--album-accent);
+      font-size:1.4rem;
+      line-height:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:background 0.2s ease, transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    }
+    .album-gallery__nav:hover{
+      background:#fff;
+      transform:translateY(-50%) scale(1.06);
+      box-shadow:0 8px 20px rgba(109,63,152,0.25);
+    }
+    .album-gallery__nav:disabled{ opacity:0.25; cursor:default; box-shadow:none; }
+    .album-gallery__nav--prev{ left:clamp(2px, 1.5vw, 18px); }
+    .album-gallery__nav--next{ right:clamp(2px, 1.5vw, 18px); }
+
+    @media (max-width:640px){
+      .album-gallery__nav{ width:36px; height:36px; font-size:1.15rem; }
+    }
+
+    /* the "mat + frame" holding the current photo */
+    .album-gallery__frame{
+      position:relative;
+      width:min(74vw, 560px);
+      height:min(70vh, 640px);
+      background:var(--album-paper);
+      border-radius:16px;
+      box-shadow:var(--album-shadow);
+      border:1px solid rgba(109,63,152,0.1);
+      padding:12px;
+      overflow:hidden;
+      touch-action:pan-y;
+    }
+    @media (max-width:640px){
+      .album-gallery__frame{ width:88vw; height:56vh; padding:8px; border-radius:12px; }
+    }
+
+    .album-gallery__loading{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Playfair Display', serif;
+      font-style:italic;
+      color:var(--album-accent);
+      font-size:0.92rem;
+      background:var(--album-paper);
+      z-index:1;
+    }
+
+    .album-slide{
+      position:absolute;
+      inset:12px;
+      border-radius:9px;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+      opacity:0;
+      transform:scale(0.97);
+      transition:opacity 0.5s ease, transform 0.5s ease;
+      pointer-events:none;
+    }
+    @media (max-width:640px){ .album-slide{ inset:8px; } }
+
+    .album-slide.is-active{
+      opacity:1;
+      transform:scale(1);
+      pointer-events:auto;
+      z-index:2;
+    }
+    .album-slide.is-leaving-left{  opacity:0; transform:scale(0.97) translateX(-4%); z-index:1; }
+    .album-slide.is-leaving-right{ opacity:0; transform:scale(0.97) translateX(4%);  z-index:1; }
+
+    .album-slide canvas{
+      max-width:100%;
+      max-height:100%;
+      display:block;
+      cursor:zoom-in;
+      transition:transform 0.35s ease;
+      transform-origin:center center;
+      touch-action:none;
+    }
+    .album-slide.is-zoomed canvas{ cursor:grab; }
+    .album-slide.is-zoomed.is-panning canvas{ cursor:grabbing; transition:none; }
+
+    .album-gallery__counter{
+      text-align:center;
+      font-family:'Playfair Display', serif;
+      font-style:italic;
+      color:var(--album-accent);
+      font-size:0.85rem;
+      margin:14px 0 4px;
+    }
+
+    /* ---------- filmstrip ---------- */
+    .album-gallery__filmstrip{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      padding:8px 4px 4px;
+      overflow-x:auto;
+      scrollbar-width:thin;
+      scrollbar-color:var(--album-accent2) transparent;
+      -webkit-overflow-scrolling:touch;
+    }
+    .album-gallery__filmstrip::-webkit-scrollbar{ height:6px; }
+    .album-gallery__filmstrip::-webkit-scrollbar-thumb{ background:rgba(142,92,186,0.4); border-radius:99px; }
+
+    .album-thumb{
+      flex:0 0 auto;
+      width:52px; height:70px;
+      border-radius:6px;
+      border:2px solid transparent;
+      background:var(--album-lilac);
+      box-shadow:0 4px 10px rgba(68,37,94,0.14);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+      padding:0;
+      overflow:hidden;
+      opacity:0.65;
+      transition:opacity 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .album-thumb:hover{ opacity:0.9; transform:translateY(-2px); }
+    .album-thumb.is-active{
+      opacity:1;
+      border-color:var(--album-accent2);
+      box-shadow:0 6px 16px rgba(142,92,186,0.35);
+    }
+    .album-thumb canvas, .album-thumb span{ max-width:100%; max-height:100%; }
+    .album-thumb span{
+      font-family:'Playfair Display', serif;
+      font-style:italic;
+      font-size:0.7rem;
+      color:var(--album-accent);
+    }
+    @media (max-width:640px){ .album-thumb{ width:40px; height:54px; } }
+
+    .album-gallery__hint{
+      margin-top:12px;
+      color:var(--album-muted);
+      font-size:0.84rem;
+      text-align:center;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .album-slide, .album-thumb, .album-gallery__nav, .album-slide canvas{ transition:none !important; }
+    }
+  </style>
 </head>
 <body class="albums-page">
   <nav class="navbar">
@@ -27,9 +231,9 @@
 
     <section class="albums-section" aria-labelledby="album-viewer-title">
       <div class="album-tabs" role="tablist" aria-label="Photo album selection">
-        <button class="album-tab is-active" type="button" role="tab" id="engagement-tab" aria-selected="true" aria-controls="album-viewer" data-pdf="pdf/Engagement.pdf" data-title="Engagement album">Engagement</button>
-        <button class="album-tab" type="button" role="tab" id="wedding-tab" aria-selected="false" aria-controls="album-viewer" data-pdf="pdf/Wedding.pdf" data-title="Wedding album">Wedding</button>
-        <button class="album-tab" type="button" role="tab" id="reception-tab" aria-selected="false" aria-controls="album-viewer" data-pdf="pdf/Reception.pdf" data-title="Reception album">Reception</button>
+        <button class="album-tab is-active" type="button" role="tab" id="engagement-tab" aria-selected="true" aria-controls="albumGallery" data-pdf="pdf/Engagement.pdf" data-title="Engagement album">Engagement</button>
+        <button class="album-tab" type="button" role="tab" id="wedding-tab" aria-selected="false" aria-controls="albumGallery" data-pdf="pdf/Wedding.pdf" data-title="Wedding album">Wedding</button>
+        <button class="album-tab" type="button" role="tab" id="reception-tab" aria-selected="false" aria-controls="albumGallery" data-pdf="pdf/Reception.pdf" data-title="Reception album">Reception</button>
       </div>
 
       <div class="album-viewer-heading">
@@ -40,10 +244,19 @@
         <a id="album-download" href="pdf/Engagement.pdf" download>Download PDF</a>
       </div>
 
-      <div class="album-pdf-scroll" tabindex="0" aria-label="Horizontally scrollable photo album">
-        <iframe id="album-viewer" class="album-pdf" src="pdf/Engagement.pdf" title="Engagement album"></iframe>
+      <!-- Canvas-rendered gallery: replaces the plain PDF iframe embed -->
+      <div class="album-gallery" id="albumGallery">
+        <div class="album-gallery__stage">
+          <button class="album-gallery__nav album-gallery__nav--prev" id="albumPrev" aria-label="Previous photo" disabled>‹</button>
+          <div class="album-gallery__frame" id="albumFrame">
+            <div class="album-gallery__loading" id="albumLoading">Opening the album…</div>
+          </div>
+          <button class="album-gallery__nav album-gallery__nav--next" id="albumNext" aria-label="Next photo" disabled>›</button>
+        </div>
+        <p class="album-gallery__counter" id="albumCounter"></p>
+        <nav class="album-gallery__filmstrip" id="albumFilmstrip" aria-label="Jump to a photo"></nav>
       </div>
-      <p class="album-scroll-hint">Scroll sideways to explore the album on smaller screens.</p>
+      <p class="album-gallery__hint">Swipe, use the arrows, or tap a thumbnail to browse. Tap a photo to zoom in.</p>
     </section>
   </main>
 
@@ -52,29 +265,394 @@
     <p>#VVForever | #VVTogether</p>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    (() => {
-      const tabs = document.querySelectorAll('.album-tab');
-      const viewer = document.getElementById('album-viewer');
-      const title = document.getElementById('album-viewer-title');
-      const download = document.getElementById('album-download');
+  (function () {
+    "use strict";
 
-      tabs.forEach((tab) => {
-        tab.addEventListener('click', () => {
-          tabs.forEach((item) => {
-            item.classList.remove('is-active');
-            item.setAttribute('aria-selected', 'false');
-          });
-          tab.classList.add('is-active');
-          tab.setAttribute('aria-selected', 'true');
-          viewer.src = tab.dataset.pdf;
-          viewer.title = tab.dataset.title;
-          title.textContent = tab.dataset.title;
-          download.href = tab.dataset.pdf;
-          download.setAttribute('download', `${tab.textContent.trim()}-album.pdf`);
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    var frame       = document.getElementById('albumFrame');
+    var filmstrip   = document.getElementById('albumFilmstrip');
+    var loadingEl   = document.getElementById('albumLoading');
+    var counterEl   = document.getElementById('albumCounter');
+    var prevBtn     = document.getElementById('albumPrev');
+    var nextBtn     = document.getElementById('albumNext');
+
+    var pdfDoc, numPages, currentPage = 1, isTransitioning = false;
+    var slideEls = {}, thumbEls = {}, renderedPages = new Set();
+    var thumbObserver = null;
+    var KEEP_RADIUS = 1;
+    var loadToken = 0; // guards against a slow-loading album finishing after the user switched tabs
+
+    /* ---------------- loading an album (called on tab switch) ---------------- */
+    function loadAlbum(pdfUrl) {
+      var myToken = ++loadToken;
+
+      // reset state
+      currentPage = 1;
+      slideEls = {}; thumbEls = {}; renderedPages = new Set();
+      if (thumbObserver) thumbObserver.disconnect();
+      frame.innerHTML = '';
+      filmstrip.innerHTML = '';
+      loadingEl.textContent = 'Opening the album…';
+      frame.appendChild(loadingEl);
+      loadingEl.style.display = 'flex';
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      counterEl.textContent = '';
+
+      pdfjsLib.getDocument(pdfUrl).promise.then(function (doc) {
+        if (myToken !== loadToken) return; // a newer tab click superseded this load
+        pdfDoc = doc;
+        numPages = doc.numPages;
+        buildSlides();
+        buildFilmstrip();
+        loadingEl.style.display = 'none';
+        goToPage(1, null, true);
+      }).catch(function (err) {
+        if (myToken !== loadToken) return;
+        if (window.location.protocol === 'file:') {
+          loadingEl.textContent = 'Local preview needs a dev server (e.g. VS Code "Live Server", or "python -m http.server") — opening this file directly won\u2019t load the PDF. It will work once deployed to vvtogether.online.';
+        } else {
+          loadingEl.textContent = 'Could not open this album. Please check the PDF path.';
+        }
+        console.error('PDF load error:', err);
+      });
+    }
+
+    function buildSlides() {
+      for (var p = 1; p <= numPages; p++) {
+        var slide = document.createElement('div');
+        slide.className = 'album-slide';
+        slide.dataset.page = p;
+        frame.appendChild(slide);
+        slideEls[p] = slide;
+      }
+    }
+
+    /* ---------------- rendering pages onto canvas, lazily ---------------- */
+    function renderPage(pageNum) {
+      if (renderedPages.has(pageNum)) return Promise.resolve();
+      var slide = slideEls[pageNum];
+      if (!slide) return Promise.resolve();
+
+      return pdfDoc.getPage(pageNum).then(function (page) {
+        var frameRect = frame.getBoundingClientRect();
+        var baseViewport = page.getViewport({ scale: 1 });
+        var fitScale = Math.min(
+          (frameRect.width  - 24) / baseViewport.width,
+          (frameRect.height - 24) / baseViewport.height
+        );
+        var pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        var viewport = page.getViewport({ scale: fitScale * pixelRatio });
+
+        var canvas = document.createElement('canvas');
+        canvas.width  = viewport.width;
+        canvas.height = viewport.height;
+        canvas.style.width  = (viewport.width  / pixelRatio) + 'px';
+        canvas.style.height = (viewport.height / pixelRatio) + 'px';
+
+        var ctx = canvas.getContext('2d');
+        return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
+          slide.innerHTML = '';
+          slide.appendChild(canvas);
+          attachZoomHandlers(slide, canvas);
+          renderedPages.add(pageNum);
         });
       });
-    })();
+    }
+
+    function unrenderPage(pageNum) {
+      var slide = slideEls[pageNum];
+      if (!slide) return;
+      slide.innerHTML = '';
+      renderedPages.delete(pageNum);
+    }
+
+    function pruneCache(around) {
+      Object.keys(slideEls).forEach(function (key) {
+        var p = parseInt(key, 10);
+        if (Math.abs(p - around) > KEEP_RADIUS) unrenderPage(p);
+      });
+    }
+
+    /* ---------------- navigation / transitions ---------------- */
+    function goToPage(pageNum, direction, isFirst) {
+      if (pageNum < 1 || pageNum > numPages) return;
+      if (pageNum === currentPage && !isFirst) return;
+      if (isTransitioning) return;
+      isTransitioning = true;
+
+      var incomingDir = direction || (pageNum > currentPage ? 'right' : 'left');
+
+      renderPage(pageNum).then(function () {
+        var outgoing = slideEls[currentPage];
+        var incoming = slideEls[pageNum];
+
+        if (!isFirst && outgoing && outgoing !== incoming) {
+          outgoing.classList.remove('is-active');
+          outgoing.classList.add(incomingDir === 'right' ? 'is-leaving-left' : 'is-leaving-right');
+        }
+
+        incoming.classList.remove('is-leaving-left', 'is-leaving-right');
+        incoming.classList.add('is-active');
+        incoming.classList.remove('is-zoomed', 'is-panning');
+        var incCanvas = incoming.querySelector('canvas');
+        if (incCanvas) incCanvas.style.transform = 'scale(1)';
+
+        currentPage = pageNum;
+        updateChrome();
+
+        setTimeout(function () {
+          if (outgoing && outgoing !== incoming) {
+            outgoing.classList.remove('is-leaving-left', 'is-leaving-right');
+          }
+          isTransitioning = false;
+        }, 520);
+
+        renderPage(Math.min(numPages, pageNum + 1));
+        renderPage(Math.max(1, pageNum - 1));
+        pruneCache(pageNum);
+      });
+    }
+
+    function updateChrome() {
+      counterEl.textContent = 'Page ' + currentPage + ' of ' + numPages;
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= numPages;
+
+      Object.keys(thumbEls).forEach(function (key) {
+        var p = parseInt(key, 10);
+        thumbEls[p].classList.toggle('is-active', p === currentPage);
+      });
+      var activeThumb = thumbEls[currentPage];
+      if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
+    prevBtn.addEventListener('click', function () { goToPage(currentPage - 1, 'left'); });
+    nextBtn.addEventListener('click', function () { goToPage(currentPage + 1, 'right'); });
+
+    document.addEventListener('keydown', function (e) {
+      // only steer the gallery when the album section is actually in view / focused
+      if (!pdfDoc) return;
+      if (e.key === 'ArrowLeft')  goToPage(currentPage - 1, 'left');
+      if (e.key === 'ArrowRight') goToPage(currentPage + 1, 'right');
+      if (e.key === 'Escape') {
+        var s = slideEls[currentPage];
+        if (s) setZoom(s, false);
+      }
+    });
+
+    /* ---------------- swipe (mobile) ---------------- */
+    var touchStartX = null, touchStartY = null;
+    frame.addEventListener('touchstart', function (e) {
+      var s = slideEls[currentPage];
+      if (s && s.classList.contains('is-zoomed')) return;
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    frame.addEventListener('touchend', function (e) {
+      if (touchStartX === null) return;
+      var s = slideEls[currentPage];
+      if (s && s.classList.contains('is-zoomed')) { touchStartX = null; return; }
+      var touch = e.changedTouches[0];
+      var dx = touch.clientX - touchStartX;
+      var dy = touch.clientY - touchStartY;
+      touchStartX = null;
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+        if (dx < 0) goToPage(currentPage + 1, 'right');
+        else        goToPage(currentPage - 1, 'left');
+      }
+    }, { passive: true });
+
+    /* click left/right thirds of the frame to advance (desktop) */
+    frame.addEventListener('click', function (e) {
+      if (e.target.tagName === 'CANVAS') return;
+      var rect = frame.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      if (x > rect.width * 0.66) goToPage(currentPage + 1, 'right');
+      else if (x < rect.width * 0.34) goToPage(currentPage - 1, 'left');
+    });
+
+    /* ---------------- zoom: click/double-tap toggle, drag-to-pan, pinch ---------------- */
+    var panX = 0, panY = 0, panning = false, panStart = null;
+    var pinchStartDist = null, pinchStartScale = 1, lastTap = 0;
+
+    function setZoom(slide, on, scale) {
+      var canvas = slide.querySelector('canvas');
+      if (!canvas) return;
+      if (on) {
+        slide.classList.add('is-zoomed');
+        canvas.style.transform = 'scale(' + (scale || 2) + ')';
+      } else {
+        slide.classList.remove('is-zoomed', 'is-panning');
+        canvas.style.transform = 'scale(1)';
+        canvas.style.transitionDuration = '';
+        panX = 0; panY = 0;
+      }
+    }
+
+    function touchDistance(touches) {
+      var dx = touches[0].clientX - touches[1].clientX;
+      var dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function getCurrentScale(canvas) {
+      var t = canvas.style.transform || '';
+      var m = t.match(/scale\(([\d.]+)\)/);
+      return m ? parseFloat(m[1]) : 1;
+    }
+
+    function attachZoomHandlers(slide, canvas) {
+      canvas.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (slide.classList.contains('is-zoomed')) setZoom(slide, false);
+        else setZoom(slide, true, 2.2);
+      });
+
+      canvas.addEventListener('touchend', function () {
+        var now = Date.now();
+        if (now - lastTap < 300) {
+          if (slide.classList.contains('is-zoomed')) setZoom(slide, false);
+          else setZoom(slide, true, 2.2);
+        }
+        lastTap = now;
+      });
+
+      canvas.addEventListener('pointerdown', function (e) {
+        if (!slide.classList.contains('is-zoomed')) return;
+        panning = true;
+        slide.classList.add('is-panning');
+        panStart = { x: e.clientX - panX, y: e.clientY - panY };
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener('pointermove', function (e) {
+        if (!panning) return;
+        panX = e.clientX - panStart.x;
+        panY = e.clientY - panStart.y;
+        var scale = getCurrentScale(canvas) || 2.2;
+        canvas.style.transform = 'translate(' + panX + 'px,' + panY + 'px) scale(' + scale + ')';
+      });
+      ['pointerup', 'pointercancel'].forEach(function (evt) {
+        canvas.addEventListener(evt, function () {
+          panning = false;
+          slide.classList.remove('is-panning');
+        });
+      });
+
+      canvas.addEventListener('touchstart', function (e) {
+        if (e.touches.length === 2) {
+          pinchStartDist = touchDistance(e.touches);
+          pinchStartScale = getCurrentScale(canvas) || 1;
+        }
+      }, { passive: true });
+
+      canvas.addEventListener('touchmove', function (e) {
+        if (e.touches.length === 2 && pinchStartDist) {
+          var dist = touchDistance(e.touches);
+          var scale = Math.min(4, Math.max(1, pinchStartScale * (dist / pinchStartDist)));
+          canvas.style.transitionDuration = '0s';
+          canvas.style.transform = 'scale(' + scale + ')';
+          slide.classList.toggle('is-zoomed', scale > 1.05);
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      canvas.addEventListener('touchend', function (e) {
+        if (e.touches.length < 2) {
+          pinchStartDist = null;
+          canvas.style.transitionDuration = '';
+        }
+      });
+    }
+
+    /* ---------------- filmstrip: real thumbnails, rendered lazily ---------------- */
+    function buildFilmstrip() {
+      thumbObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            renderThumb(parseInt(entry.target.dataset.page, 10));
+            thumbObserver.unobserve(entry.target);
+          }
+        });
+      }, { root: filmstrip, rootMargin: '200px' });
+
+      for (var p = 1; p <= numPages; p++) {
+        var btn = document.createElement('button');
+        btn.className = 'album-thumb';
+        btn.type = 'button';
+        btn.dataset.page = p;
+        btn.setAttribute('aria-label', 'Go to page ' + p);
+        btn.innerHTML = '<span>' + p + '</span>';
+        btn.addEventListener('click', function () {
+          var target = parseInt(this.dataset.page, 10);
+          goToPage(target, target > currentPage ? 'right' : 'left');
+        });
+        filmstrip.appendChild(btn);
+        thumbEls[p] = btn;
+        thumbObserver.observe(btn);
+      }
+    }
+
+    function renderThumb(pageNum) {
+      var btn = thumbEls[pageNum];
+      if (!btn || !pdfDoc) return;
+      pdfDoc.getPage(pageNum).then(function (page) {
+        var baseViewport = page.getViewport({ scale: 1 });
+        var targetW = 52 * (window.devicePixelRatio || 1);
+        var scale = targetW / baseViewport.width;
+        var viewport = page.getViewport({ scale: scale });
+
+        var canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        var ctx = canvas.getContext('2d');
+        page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
+          btn.innerHTML = '';
+          btn.appendChild(canvas);
+        });
+      });
+    }
+
+    /* ---------------- re-fit current page on resize/rotate ---------------- */
+    var resizeTimer = null;
+    window.addEventListener('resize', function () {
+      if (!pdfDoc) return;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        renderedPages.delete(currentPage);
+        renderPage(currentPage);
+      }, 250);
+    });
+
+    /* ---------------- tabs: Engagement / Wedding / Reception ---------------- */
+    var tabs = document.querySelectorAll('.album-tab');
+    var title = document.getElementById('album-viewer-title');
+    var download = document.getElementById('album-download');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (item) {
+          item.classList.remove('is-active');
+          item.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+        title.textContent = tab.dataset.title;
+        download.href = tab.dataset.pdf;
+        download.setAttribute('download', tab.textContent.trim() + '-album.pdf');
+        loadAlbum(tab.dataset.pdf);
+      });
+    });
+
+    // initial load
+    loadAlbum(tabs[0].dataset.pdf);
+  })();
   </script>
 </body>
 </html>
