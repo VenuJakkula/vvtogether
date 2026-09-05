@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Venu &amp; Vasavi | Albums</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body class="albums-page">
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">Home</a>
+      <div class="nav-menu">
+        <a href="archives.html" class="nav-link">Wedding Archives</a>
+        <a href="albums.html" class="nav-link active">Albums</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="albums-hero">
+      <p class="albums-hero__eyebrow">Venu &amp; Vasavi</p>
+      <h1>Our albums</h1>
+      <p>Three celebrations, collected in the pages that hold our favourite memories.</p>
+    </section>
+
+    <section class="albums-section" aria-labelledby="album-viewer-title">
+      <div class="album-tabs" role="tablist" aria-label="Photo album selection">
+        <button class="album-tab is-active" type="button" role="tab" id="engagement-tab" aria-selected="true" aria-controls="album-viewer" data-pdf="pdf/Engagement.pdf" data-title="Engagement album">Engagement</button>
+        <button class="album-tab" type="button" role="tab" id="wedding-tab" aria-selected="false" aria-controls="album-viewer" data-pdf="pdf/Wedding.pdf" data-title="Wedding album">Wedding</button>
+        <button class="album-tab" type="button" role="tab" id="reception-tab" aria-selected="false" aria-controls="album-viewer" data-pdf="pdf/Reception.pdf" data-title="Reception album">Reception</button>
+      </div>
+
+      <div class="album-viewer-heading">
+        <div>
+          <p class="album-viewer-heading__eyebrow">Photo book</p>
+          <h2 id="album-viewer-title">Engagement album</h2>
+        </div>
+        <a id="album-download" href="pdf/Engagement.pdf" download>Download PDF</a>
+      </div>
+
+      <div class="album-pdf-scroll" tabindex="0" aria-label="Horizontally scrollable photo album">
+        <iframe id="album-viewer" class="album-pdf" src="pdf/Engagement.pdf" title="Engagement album"></iframe>
+      </div>
+      <p class="album-scroll-hint">Scroll sideways to explore the album on smaller screens.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Made with love by Venu &amp; Vasavi</p>
+    <p>#VVForever | #VVTogether</p>
+  </footer>
+
+  <script>
+    (() => {
+      const tabs = document.querySelectorAll('.album-tab');
+      const viewer = document.getElementById('album-viewer');
+      const title = document.getElementById('album-viewer-title');
+      const download = document.getElementById('album-download');
+
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          tabs.forEach((item) => {
+            item.classList.remove('is-active');
+            item.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('is-active');
+          tab.setAttribute('aria-selected', 'true');
+          viewer.src = tab.dataset.pdf;
+          viewer.title = tab.dataset.title;
+          title.textContent = tab.dataset.title;
+          download.href = tab.dataset.pdf;
+          download.setAttribute('download', `${tab.textContent.trim()}-album.pdf`);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
