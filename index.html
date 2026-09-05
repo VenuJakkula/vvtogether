@@ -548,6 +548,76 @@
 
       const navbar = document.querySelector('.navbar');
       window.addEventListener('scroll', () => navbar.classList.toggle('navbar--scrolled', window.scrollY > 50));
+
+      const revealContainer = document.getElementById('revealContainer');
+      const revealOverlay = document.getElementById('revealOverlay');
+      const heartPath = document.getElementById('heartPath');
+      const heartIndicator = document.getElementById('heartIndicator');
+      const heartSize = document.getElementById('heartSize');
+      const revealAll = document.getElementById('revealAllBtn');
+      const resetReveal = document.getElementById('resetBtn');
+
+      if (revealContainer && revealOverlay && heartPath && heartIndicator && heartSize && revealAll && resetReveal) {
+        const svgWidth = 1000;
+        const svgHeight = 700;
+        let heartX = 500;
+        let heartY = 350;
+        let heartScale = Number(heartSize.value);
+        let isRevealed = false;
+
+        const updateHeart = () => {
+          heartPath.setAttribute('transform', `translate(${heartX},${heartY}) scale(${heartScale})`);
+          const box = revealContainer.getBoundingClientRect();
+          const centreY = heartY - (heartScale * 20);
+          heartIndicator.style.left = `${(heartX / svgWidth) * box.width}px`;
+          heartIndicator.style.top = `${(centreY / svgHeight) * box.height}px`;
+          heartIndicator.style.fontSize = `${Math.max(1.5, heartScale * 0.8)}rem`;
+        };
+
+        const moveHeartTo = (event) => {
+          if (isRevealed) return;
+          const box = revealContainer.getBoundingClientRect();
+          heartX = Math.max(0, Math.min(svgWidth, ((event.clientX - box.left) / box.width) * svgWidth));
+          heartY = Math.max(0, Math.min(svgHeight, ((event.clientY - box.top) / box.height) * svgHeight));
+          updateHeart();
+        };
+
+        revealContainer.addEventListener('pointerdown', (event) => {
+          if (isRevealed) return;
+          revealContainer.setPointerCapture(event.pointerId);
+          moveHeartTo(event);
+          event.preventDefault();
+        });
+        revealContainer.addEventListener('pointermove', (event) => {
+          if (revealContainer.hasPointerCapture(event.pointerId)) moveHeartTo(event);
+        });
+        revealContainer.addEventListener('pointerup', (event) => {
+          if (revealContainer.hasPointerCapture(event.pointerId)) revealContainer.releasePointerCapture(event.pointerId);
+        });
+        heartSize.addEventListener('input', () => {
+          heartScale = Number(heartSize.value);
+          updateHeart();
+        });
+        revealAll.addEventListener('click', () => {
+          isRevealed = true;
+          revealOverlay.classList.add('hidden');
+          heartIndicator.hidden = true;
+          revealAll.textContent = 'Photo Revealed!';
+        });
+        resetReveal.addEventListener('click', () => {
+          isRevealed = false;
+          heartX = 500;
+          heartY = 350;
+          heartScale = Number(heartSize.defaultValue);
+          heartSize.value = heartScale;
+          revealOverlay.classList.remove('hidden');
+          heartIndicator.hidden = false;
+          revealAll.textContent = 'Reveal Full Photo';
+          updateHeart();
+        });
+        window.addEventListener('resize', updateHeart);
+        updateHeart();
+      }
     })();
   </script>
 
