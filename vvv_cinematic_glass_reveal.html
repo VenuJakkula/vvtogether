@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>#VVv — Cinematic Glass Reveal</title>
+<style>
+  html, body { margin:0; padding:0; width:100%; height:100%; background:#050506; overflow:hidden; }
+  #scene-container { position: fixed; inset:0; }
+  canvas { display:block; }
+
+  .caption {
+    position: fixed;
+    left: 0; right: 0;
+    bottom: 9%;
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: clamp(10px, 1.6vw, 13px);
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 1.6s ease 0.3s;
+    pointer-events: none;
+  }
+  .caption.is-visible { opacity: 1; }
+
+  .loading {
+    position: fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    transition: opacity 0.6s ease;
+  }
+  .loading.hidden { opacity: 0; pointer-events: none; }
+
+  .webgl-fallback {
+    position: fixed; inset:0;
+    display:none;
+    align-items:center; justify-content:center;
+    color: rgba(255,255,255,0.75);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    text-align:center; padding: 20px;
+    letter-spacing: 0.1em;
+  }
+
+  .debug-hud {
+    position: fixed;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.55);
+    color: #9fe6a0;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    line-height: 1.5;
+    max-width: 70vw;
+    white-space: pre-wrap;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .debug-hud.is-visible { opacity: 1; }
+  .debug-hud.is-error { color: #ff8a8a; }
+</style>
+</head>
+<body>
+
+<div id="scene-container"></div>
+<p class="caption" id="caption">Venu &nbsp;·&nbsp; Vasavi &nbsp;·&nbsp; Our Little One</p>
+<div class="loading" id="loading">Loading glass&hellip;</div>
+<div class="webgl-fallback" id="webglFallback">#VVv</div>
+<pre class="debug-hud" id="debugHud"></pre>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const container = document.getElementById('scene-container');
+const loadingEl = document.getElementById('loading');
+const captionEl = document.getElementById('caption');
+const fallbackEl = document.getElementById('webglFallback');
+const debugHud = document.getElementById('debugHud');
+
+function showDebug(text, isError) {
+  debugHud.textContent = text;
+  debugHud.classList.add('is-visible');
+  debugHud.classList.toggle('is-error', !!isError);
+}
+
+function hasWebGL() {
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+  } catch (e) {
+    return false;
+  }
+}
+
+if (!hasWebGL()) {
+  fallbackEl.style.display = 'flex';
+  loadingEl.classList.add('hidden');
+} else {
+  try {
+    init();
+  } catch (err) {
+    loadingEl.classList.add('hidden');
+    showDebug('Init error: ' + (err && err.message ? err.message : err), true);
+    console.error(err);
+  }
+}
+
+window.addEventListener('error', (e) => {
+  showDebug('Script error: ' + (e && e.message ? e.message : e), true);
+});
+
+function easeInOutCubic(x) {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
+function init() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x050506);
+  scene.fog = new THREE.FogExp2(0x050506, 0.05);
+
+  const camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.05, 10000);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  container.appendChild(renderer.domElement);
+
+  // Studio-style environment so the transmissive glass has something to reflect
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.045).texture;
+
+  // ---- lighting: broad key, narrow rim, faint fill ----
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
+  keyLight.position.set(-3.5, 4, 4);
+  scene.add(keyLight);
+
+  const rimLight = new THREE.DirectionalLight(0xeaf1ff, 3.6);
+  rimLight.position.set(4, 2.4, -3);
+  scene.add(rimLight);
+
+  const fillLight = new THREE.DirectionalLight(0xbfd0ff, 0.45);
+  fillLight.position.set(-2, -1.5, -3);
+  scene.add(fillLight);
+
+  const ambient = new THREE.HemisphereLight(0x2a2a33, 0x050506, 0.3);
+  scene.add(ambient);
+
+  // ---- smoked / liquid optical-glass material ----
+  const glassMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0x0c0c10,
+    metalness: 0,
+    roughness: 0.07,
+    transmission: 1.0,
+    thickness: 1.6,
+    ior: 1.5,
+    clearcoat: 1,
+    clearcoatRoughness: 0.06,
+    attenuationColor: new THREE.Color(0x17161d),
+    attenuationDistance: 0.55,
+    envMapIntensity: 1.5,
+    specularIntensity: 1,
+  });
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  let wordmarkRadius = 4;
+
+  const loader = new FontLoader();
+  loader.load(
+    'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json',
+    (font) => {
+      try {
+        buildWordmark(font);
+        loadingEl.classList.add('hidden');
+        startCameraSequence();
+      } catch (err) {
+        loadingEl.classList.add('hidden');
+        showDebug('Build error: ' + (err && err.message ? err.message : err), true);
+        console.error(err);
+      }
+    },
+    undefined,
+    (err) => {
+      loadingEl.textContent = 'Could not load glass typeface';
+      showDebug('Font load error: ' + (err && err.message ? err.message : err), true);
+    }
+  );
+
+  function makeLetterGeometry(char, font, size, depth) {
+    const geo = new TextGeometry(char, {
+      font,
+      size,
+      depth,
+      curveSegments: 24,
+      bevelEnabled: true,
+      bevelThickness: size * 0.09,
+      bevelSize: size * 0.055,
+      bevelOffset: 0,
+      bevelSegments: 8,
+    });
+    geo.computeBoundingBox();
+    return geo;
+  }
+
+  function buildWordmark(font) {
+    const RAW_SIZE = 1.0;
+    const DEPTH = 0.85;
+    const LOWER_RAW_SIZE = 0.78;
+    const SPACING_RATIO = 0.22;      // relative to TARGET_CAP_HEIGHT, applied after normalization
+    const TARGET_CAP_HEIGHT = 1.0;   // guaranteed final on-screen height of a capital V
+    const TARGET_DEPTH = 0.18;       // guaranteed final glass thickness, regardless of whatever
+                                      // raw depth the extrusion actually produced
+
+    const hashGeo = makeLetterGeometry('#', font, RAW_SIZE, DEPTH);
+    const v1Geo   = makeLetterGeometry('V', font, RAW_SIZE, DEPTH);
+    const v2Geo   = makeLetterGeometry('V', font, RAW_SIZE, DEPTH);
+    const vLowGeo = makeLetterGeometry('v', font, LOWER_RAW_SIZE, DEPTH * 0.92);
+
+    const measuredCapHeight = v1Geo.boundingBox.max.y - v1Geo.boundingBox.min.y;
+    const xyScale = measuredCapHeight > 0 ? TARGET_CAP_HEIGHT / measuredCapHeight : 1;
+
+    // Match the hashtag's visual height to the (now-normalized) capital V.
+    const hashHeight = hashGeo.boundingBox.max.y - hashGeo.boundingBox.min.y;
+    const hashXYScale = (hashHeight > 0 ? measuredCapHeight / hashHeight : 1) * xyScale;
+
+    const letters = [
+      { geo: hashGeo, xyScale: hashXYScale },
+      { geo: v1Geo,   xyScale },
+      { geo: v2Geo,   xyScale },
+      { geo: vLowGeo, xyScale },
+    ];
+
+    const SPACING = SPACING_RATIO * TARGET_CAP_HEIGHT;
+    let cursorX = 0;
+
+    letters.forEach(({ geo, xyScale: sXY }) => {
+      const mesh = new THREE.Mesh(geo, glassMaterial);
+
+      const bb = geo.boundingBox;
+      // Depth is normalized INDEPENDENTLY of X/Y, per letter, based on that
+      // letter's own raw extrusion extent - this is what corrects the ~50x
+      // depth bug regardless of what caused it.
+      const rawDepth = bb.max.z - bb.min.z;
+      const zScale = rawDepth > 0 ? TARGET_DEPTH / rawDepth : sXY;
+      mesh.scale.set(sXY, sXY, zScale);
+
+      const width = (bb.max.x - bb.min.x) * sXY;
+      const depthSpan = (bb.max.z - bb.min.z) * zScale;
+
+      // Position by left edge along a shared baseline (y stays at the
+      // font's natural baseline so all four glyphs align correctly).
+      mesh.position.x = cursorX - bb.min.x * sXY;
+      mesh.position.z = -depthSpan / 2;
+
+      group.add(mesh);
+      cursorX += width + SPACING;
+    });
+
+    // Centre the whole wordmark at the origin so the camera can orbit it.
+    const box = new THREE.Box3().setFromObject(group);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    group.position.x -= center.x;
+    group.position.y -= center.y;
+
+    // Recompute after centring, then fit the camera distance to the actual
+    // measured bounding sphere - this is robust regardless of exactly how
+    // large the extruded geometry turns out to be, instead of guessing a
+    // fixed multiplier (which is what put the camera inside the object).
+    const finalBox = new THREE.Box3().setFromObject(group);
+    const sphere = new THREE.Sphere();
+    finalBox.getBoundingSphere(sphere);
+    const size = new THREE.Vector3();
+    finalBox.getSize(size);
+
+    const vFov = THREE.MathUtils.degToRad(camera.fov);
+    const aspect = container.clientWidth / container.clientHeight;
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+    const limitingFov = Math.min(vFov, hFov);
+    let fitDistance = sphere.radius / Math.sin(limitingFov / 2);
+    fitDistance = Math.max(2, Math.min(fitDistance, 300)); // sanity clamp
+
+    wordmarkRadius = fitDistance;
+
+    showDebug(
+      'wordmark size  W:' + size.x.toFixed(2) + '  H:' + size.y.toFixed(2) + '  D:' + size.z.toFixed(2) +
+      '\nbounding radius: ' + sphere.radius.toFixed(2) +
+      '\ncamera fit distance: ' + fitDistance.toFixed(2),
+      false
+    );
+  }
+
+  // ---- cinematic camera: edge-on start -> slow crane/orbit -> elevated hero view ----
+  const target = new THREE.Vector3(0, 0, 0);
+  let lightSweepStart = null;
+
+  function cameraPose(t) {
+    const eased = easeInOutCubic(t);
+    const azimuthDeg = THREE.MathUtils.lerp(88, 0, eased);
+    const elevationDeg = THREE.MathUtils.lerp(3, 20, eased);
+    // wordmarkRadius now already IS a fitted camera distance (see buildWordmark),
+    // padded 30% during the intro and settling to a slightly tighter hero framing.
+    const radius = THREE.MathUtils.lerp(wordmarkRadius * 1.3, wordmarkRadius * 1.05, eased);
+
+    const azimuth = THREE.MathUtils.degToRad(azimuthDeg);
+    const elevation = THREE.MathUtils.degToRad(elevationDeg);
+
+    camera.position.x = radius * Math.sin(azimuth) * Math.cos(elevation);
+    camera.position.z = radius * Math.cos(azimuth) * Math.cos(elevation);
+    camera.position.y = radius * Math.sin(elevation);
+    camera.lookAt(target);
+  }
+
+  function startCameraSequence() {
+    if (prefersReducedMotion) {
+      cameraPose(1);
+      captionEl.classList.add('is-visible');
+      lightSweepStart = performance.now();
+      renderLoop(lightSweepStart);
+      return;
+    }
+
+    const duration = 5200; // slow cinematic crane/orbit, not a mechanical spin
+    const start = performance.now();
+
+    function step(now) {
+      const t = Math.min(1, (now - start) / duration);
+      cameraPose(t);
+      renderer.render(scene, camera);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        captionEl.classList.add('is-visible');
+        lightSweepStart = now;
+        renderLoop(now);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function renderLoop(now) {
+    // Camera stays completely still after the reveal (no wobble/float).
+    // Only a very slow, restrained light drift gives the glass a hint of
+    // living, liquid movement.
+    if (lightSweepStart !== null) {
+      const elapsed = (now - lightSweepStart) / 1000;
+      const angle = Math.sin(elapsed * 0.18) * 0.5;
+      rimLight.position.x = 4 * Math.cos(angle) - Math.sin(angle);
+      rimLight.position.z = -3 * Math.cos(angle) + 1.2 * Math.sin(angle);
+      keyLight.position.x = -3.5 + Math.sin(elapsed * 0.13) * 0.8;
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(renderLoop);
+  }
+
+  window.addEventListener('resize', () => {
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+
+  // static edge-on frame while the font streams in
+  cameraPose(0);
+  renderer.render(scene, camera);
+}
+</script>
+
+</body>
+</html>

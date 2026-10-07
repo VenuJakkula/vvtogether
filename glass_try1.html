@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>#VVv — Cinematic Glass Reveal</title>
+<style>
+  html, body { margin:0; padding:0; width:100%; height:100%; background:#050506; overflow:hidden; }
+  #scene-container { position: fixed; inset:0; }
+  canvas { display:block; }
+
+  .caption {
+    position: fixed;
+    left: 0; right: 0;
+    bottom: 9%;
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: clamp(10px, 1.6vw, 13px);
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 1.6s ease 0.3s;
+    pointer-events: none;
+  }
+  .caption.is-visible { opacity: 1; }
+
+  .loading {
+    position: fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    color: rgba(255,255,255,0.4);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    transition: opacity 0.6s ease;
+    text-align: center;
+    padding: 0 20px;
+  }
+  .loading.hidden { opacity: 0; pointer-events: none; }
+
+  .webgl-fallback {
+    position: fixed; inset:0;
+    display:none;
+    flex-direction: column;
+    gap: 14px;
+    align-items:center; justify-content:center;
+    color: rgba(255,255,255,0.85);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align:center; padding: 20px;
+  }
+  .webgl-fallback .mark { font-size: 15vw; font-weight: 700; letter-spacing: 0.02em; }
+  .webgl-fallback .sub {
+    font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<div id="scene-container"></div>
+<p class="caption" id="caption">Venu &nbsp;·&nbsp; Vasavi &nbsp;·&nbsp; Our Little One</p>
+<div class="loading" id="loading">Loading glass&hellip;</div>
+<div class="webgl-fallback" id="webglFallback">
+  <div class="mark">#VVv</div>
+  <div class="sub">Venu &nbsp;·&nbsp; Vasavi &nbsp;·&nbsp; Our Little One</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const container = document.getElementById('scene-container');
+const loadingEl = document.getElementById('loading');
+const captionEl = document.getElementById('caption');
+const fallbackEl = document.getElementById('webglFallback');
+
+function showFallback(message) {
+  if (message) console.error(message);
+  fallbackEl.style.display = 'flex';
+  loadingEl.classList.add('hidden');
+  container.style.display = 'none';
+}
+
+function hasWebGL() {
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+  } catch (e) {
+    return false;
+  }
+}
+
+if (!hasWebGL()) {
+  showFallback('WebGL not available');
+} else {
+  init();
+}
+
+function easeInOutCubic(x) {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
+function init() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x08080a);
+  scene.fog = new THREE.FogExp2(0x08080a, 0.045);
+
+  const camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.1, 100);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  container.appendChild(renderer.domElement);
+
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.045).texture;
+
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
+  keyLight.position.set(-3.5, 4, 4);
+  scene.add(keyLight);
+
+  const rimLight = new THREE.DirectionalLight(0xeaf1ff, 3.8);
+  rimLight.position.set(4, 2.4, -3);
+  scene.add(rimLight);
+
+  const fillLight = new THREE.DirectionalLight(0xbfd0ff, 0.55);
+  fillLight.position.set(-2, -1.5, -3);
+  scene.add(fillLight);
+
+  const ambient = new THREE.HemisphereLight(0x33333d, 0x08080a, 0.4);
+  scene.add(ambient);
+
+  const glassMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0x0e0e12,
+    metalness: 0,
+    roughness: 0.08,
+    transmission: 0.95,
+    thickness: 1.5,
+    ior: 1.5,
+    clearcoat: 1,
+    clearcoatRoughness: 0.06,
+    attenuationColor: new THREE.Color(0x1a191f),
+    attenuationDistance: 0.6,
+    envMapIntensity: 1.6,
+    specularIntensity: 1,
+  });
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  let wordmarkRadius = 4;
+
+  // ---- the "#" is built from primitive extruded bars, NOT a font glyph ----
+  // (typeface JSON files used for 3D text often don't include "#", and a
+  // missing glyph would throw and silently break the whole scene)
+  function buildHashMesh(height, depth) {
+    const barT = height * 0.16;
+    const width = height * 0.86;
+    const overshoot = height * 0.09;
+    const vLen = height + overshoot * 2;
+    const hLen = width * 1.12;
+
+    function barGeo(w, h) {
+      const shape = new THREE.Shape();
+      shape.moveTo(-w / 2, -h / 2);
+      shape.lineTo(w / 2, -h / 2);
+      shape.lineTo(w / 2, h / 2);
+      shape.lineTo(-w / 2, h / 2);
+      shape.lineTo(-w / 2, -h / 2);
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth,
+        curveSegments: 2,
+        bevelEnabled: true,
+        bevelThickness: height * 0.05,
+        bevelSize: height * 0.035,
+        bevelSegments: 5,
+      });
+      geo.translate(0, 0, -depth / 2);
+      return geo;
+    }
+
+    const vGeo = barGeo(barT, vLen);
+    const hGeo = barGeo(hLen, barT);
+    const vCenterY = height / 2;
+
+    const hashGroup = new THREE.Group();
+    const v1 = new THREE.Mesh(vGeo, glassMaterial);
+    v1.position.set(-width / 2 + barT * 0.85, vCenterY, 0);
+    const v2 = new THREE.Mesh(vGeo, glassMaterial);
+    v2.position.set(width / 2 - barT * 0.85, vCenterY, 0);
+    const h1 = new THREE.Mesh(hGeo, glassMaterial);
+    h1.position.set(0, height * 0.34, 0);
+    const h2 = new THREE.Mesh(hGeo, glassMaterial);
+    h2.position.set(0, height * 0.68, 0);
+
+    hashGroup.add(v1, v2, h1, h2);
+    return hashGroup;
+  }
+
+  function makeLetterMesh(char, font, size, depth) {
+    const geo = new TextGeometry(char, {
+      font,
+      size,
+      depth,
+      curveSegments: 24,
+      bevelEnabled: true,
+      bevelThickness: size * 0.09,
+      bevelSize: size * 0.055,
+      bevelOffset: 0,
+      bevelSegments: 8,
+    });
+    return new THREE.Mesh(geo, glassMaterial);
+  }
+
+  const loader = new FontLoader();
+  loader.load(
+    'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json',
+    (font) => {
+      try {
+        buildWordmark(font);
+        loadingEl.classList.add('hidden');
+        startCameraSequence();
+      } catch (err) {
+        showFallback('Failed to build 3D wordmark: ' + err.message);
+      }
+    },
+    undefined,
+    () => { showFallback('Could not load glass typeface'); }
+  );
+
+  function buildWordmark(font) {
+    const CAP_SIZE = 1.0;
+    const DEPTH = 0.85;
+    const LOWER_SIZE = 0.78;
+    const SPACING = 0.24;
+
+    const items = [
+      buildHashMesh(CAP_SIZE, DEPTH),
+      makeLetterMesh('V', font, CAP_SIZE, DEPTH),
+      makeLetterMesh('V', font, CAP_SIZE, DEPTH),
+      makeLetterMesh('v', font, LOWER_SIZE, DEPTH * 0.92),
+    ];
+
+    let cursorX = 0;
+
+    items.forEach((object) => {
+      const bb = new THREE.Box3().setFromObject(object);
+      if (!isFinite(bb.min.x) || !isFinite(bb.max.x)) {
+        throw new Error('A letter failed to generate valid geometry');
+      }
+      const width = bb.max.x - bb.min.x;
+      const depthSpan = bb.max.z - bb.min.z;
+
+      object.position.x += cursorX - bb.min.x;
+      object.position.z += -depthSpan / 2 - bb.min.z;
+
+      group.add(object);
+      cursorX += width + SPACING;
+    });
+
+    if (group.children.length === 0) {
+      throw new Error('Wordmark has no letters');
+    }
+
+    const box = new THREE.Box3().setFromObject(group);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    group.position.x -= center.x;
+    group.position.y -= center.y;
+
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const computedRadius = Math.max(size.x, size.y) * 0.85;
+
+    wordmarkRadius = isFinite(computedRadius) && computedRadius > 0.5 ? computedRadius : 4;
+  }
+
+  const target = new THREE.Vector3(0, 0, 0);
+  let lightSweepStart = null;
+
+  function cameraPose(t) {
+    const eased = easeInOutCubic(t);
+    const azimuthDeg = THREE.MathUtils.lerp(88, 0, eased);
+    const elevationDeg = THREE.MathUtils.lerp(3, 20, eased);
+    const radius = THREE.MathUtils.lerp(wordmarkRadius * 2.6, wordmarkRadius * 1.75, eased);
+
+    const azimuth = THREE.MathUtils.degToRad(azimuthDeg);
+    const elevation = THREE.MathUtils.degToRad(elevationDeg);
+
+    camera.position.x = radius * Math.sin(azimuth) * Math.cos(elevation);
+    camera.position.z = radius * Math.cos(azimuth) * Math.cos(elevation);
+    camera.position.y = radius * Math.sin(elevation);
+    camera.lookAt(target);
+  }
+
+  function startCameraSequence() {
+    if (prefersReducedMotion) {
+      cameraPose(1);
+      captionEl.classList.add('is-visible');
+      lightSweepStart = performance.now();
+      renderLoop(lightSweepStart);
+      return;
+    }
+
+    const duration = 5200;
+    const start = performance.now();
+
+    function step(now) {
+      const t = Math.min(1, (now - start) / duration);
+      cameraPose(t);
+      renderer.render(scene, camera);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        captionEl.classList.add('is-visible');
+        lightSweepStart = now;
+        renderLoop(now);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function renderLoop(now) {
+    if (lightSweepStart !== null) {
+      const elapsed = (now - lightSweepStart) / 1000;
+      const angle = Math.sin(elapsed * 0.18) * 0.5;
+      rimLight.position.x = 4 * Math.cos(angle) - Math.sin(angle);
+      rimLight.position.z = -3 * Math.cos(angle) + 1.2 * Math.sin(angle);
+      keyLight.position.x = -3.5 + Math.sin(elapsed * 0.13) * 0.8;
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(renderLoop);
+  }
+
+  window.addEventListener('resize', () => {
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+
+  cameraPose(0);
+  renderer.render(scene, camera);
+}
+</script>
+
+</body>
+</html>
+</html>

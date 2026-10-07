@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>#VVv — Liquid Glass 3D</title>
+<style>
+  :root{
+    --bg0:#080814;
+    --bg1:#121126;
+    --bg2:#221736;
+    --glass-a:rgba(255,255,255,.86);
+    --glass-b:rgba(215,222,255,.22);
+    --glass-c:rgba(173,145,255,.12);
+    --edge:rgba(255,255,255,.72);
+    --shadow:rgba(0,0,0,.65);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg0)}
+  body{
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    color:white;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:
+      radial-gradient(circle at 28% 12%, rgba(122,95,255,.20), transparent 31%),
+      radial-gradient(circle at 82% 30%, rgba(79,186,255,.10), transparent 28%),
+      radial-gradient(circle at 48% 86%, rgba(218,124,255,.13), transparent 35%),
+      linear-gradient(145deg,var(--bg0) 0%,var(--bg1) 48%,var(--bg2) 100%);
+  }
+
+  .vvv-wrap{
+    width:min(1120px,96vw);
+    min-height:540px;
+    display:grid;
+    place-items:center;
+    position:relative;
+    isolation:isolate;
+  }
+
+  .vvv-glow{
+    position:absolute;
+    width:72%;
+    height:28%;
+    left:14%;
+    bottom:18%;
+    border-radius:50%;
+    background:radial-gradient(ellipse,rgba(131,101,255,.28),rgba(67,50,120,.09) 45%,transparent 72%);
+    filter:blur(42px);
+    transform:translateZ(-200px);
+    pointer-events:none;
+  }
+
+  .vvv-stage{
+    position:relative;
+    width:min(980px,94vw);
+    height:420px;
+    perspective:1450px;
+    perspective-origin:50% 48%;
+    display:grid;
+    place-items:center;
+    overflow:visible;
+  }
+
+  /* CAMERA RIG: moving this creates the cinematic fly-around. */
+  .vvv-camera{
+    position:relative;
+    transform-style:preserve-3d;
+    will-change:transform;
+    animation:cameraFly 5.4s cubic-bezier(.16,.82,.19,1) both;
+  }
+
+  .vvv-object{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:clamp(8px,1.8vw,24px);
+    transform-style:preserve-3d;
+    position:relative;
+    filter:drop-shadow(0 34px 34px rgba(0,0,0,.36));
+  }
+
+  .glyph{
+    --d:34px;
+    --w:160px;
+    --h:215px;
+    position:relative;
+    width:var(--w);
+    height:var(--h);
+    transform-style:preserve-3d;
+    transform:translateZ(0);
+  }
+
+  .glyph.hash{--w:145px}
+  .glyph.smallv{--w:132px; --h:178px; margin-top:31px}
+
+  .face,
+  .back,
+  .slice{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+
+  .face{ transform:translateZ(calc(var(--d) / 2)); }
+  .back{ transform:translateZ(calc(var(--d) / -2)); opacity:.58; filter:brightness(.52) saturate(.8); }
+
+  .face svg,.back svg,.slice svg{width:100%;height:100%;display:block;overflow:visible}
+
+  /* A set of tightly spaced silhouette copies creates true readable thickness. */
+  .slice{opacity:.92}
+  .slice:nth-of-type(1){transform:translateZ(-15px)}
+  .slice:nth-of-type(2){transform:translateZ(-12px)}
+  .slice:nth-of-type(3){transform:translateZ(-9px)}
+  .slice:nth-of-type(4){transform:translateZ(-6px)}
+  .slice:nth-of-type(5){transform:translateZ(-3px)}
+  .slice:nth-of-type(6){transform:translateZ(0px)}
+  .slice:nth-of-type(7){transform:translateZ(3px)}
+  .slice:nth-of-type(8){transform:translateZ(6px)}
+  .slice:nth-of-type(9){transform:translateZ(9px)}
+  .slice:nth-of-type(10){transform:translateZ(12px)}
+  .slice:nth-of-type(11){transform:translateZ(15px)}
+
+  .specular-sweep{
+    position:absolute;
+    inset:-14%;
+    transform:translateZ(22px) skewX(-18deg) translateX(-135%);
+    background:linear-gradient(100deg,transparent 34%,rgba(255,255,255,.02) 42%,rgba(255,255,255,.52) 50%,rgba(215,231,255,.11) 58%,transparent 68%);
+    mix-blend-mode:screen;
+    filter:blur(2px);
+    opacity:.72;
+    animation:specSweep 5.4s cubic-bezier(.16,.82,.19,1) both;
+    clip-path:inset(0);
+    pointer-events:none;
+  }
+
+  .vvv-object::after{
+    content:"";
+    position:absolute;
+    width:88%;
+    height:42px;
+    left:6%;
+    bottom:-62px;
+    background:radial-gradient(ellipse,rgba(0,0,0,.58),rgba(0,0,0,.22) 43%,transparent 72%);
+    filter:blur(16px);
+    transform:rotateX(78deg) translateZ(-72px);
+  }
+
+  .vvv-caption{
+    position:absolute;
+    bottom:8px;
+    left:50%;
+    transform:translateX(-50%);
+    white-space:nowrap;
+    font-size:clamp(12px,1.2vw,15px);
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,.58);
+    opacity:0;
+    animation:captionIn 1.2s ease 4.45s forwards;
+  }
+
+  @keyframes cameraFly{
+    0%{
+      transform:
+        translate3d(-360px,40px,-210px)
+        rotateY(72deg)
+        rotateX(-5deg)
+        rotateZ(-3deg)
+        scale(.78);
+    }
+    18%{
+      transform:
+        translate3d(-215px,22px,-120px)
+        rotateY(53deg)
+        rotateX(-1deg)
+        rotateZ(-2deg)
+        scale(.87);
+    }
+    45%{
+      transform:
+        translate3d(-72px,-42px,-40px)
+        rotateY(30deg)
+        rotateX(12deg)
+        rotateZ(-.8deg)
+        scale(.95);
+    }
+    70%{
+      transform:
+        translate3d(6px,-68px,8px)
+        rotateY(12deg)
+        rotateX(25deg)
+        rotateZ(0deg)
+        scale(1.015);
+    }
+    100%{
+      transform:
+        translate3d(0,-42px,0)
+        rotateY(0deg)
+        rotateX(17deg)
+        rotateZ(0deg)
+        scale(1);
+    }
+  }
+
+  @keyframes specSweep{
+    0%,14%{transform:translateZ(22px) skewX(-18deg) translateX(-135%);opacity:.15}
+    48%{opacity:.78}
+    76%{transform:translateZ(22px) skewX(-18deg) translateX(105%);opacity:.68}
+    100%{transform:translateZ(22px) skewX(-18deg) translateX(145%);opacity:0}
+  }
+
+  @keyframes captionIn{to{opacity:1;transform:translateX(-50%) translateY(-8px)}}
+
+  @keyframes microFloat{
+    0%,100%{transform:translate3d(0,-42px,0) rotateY(0deg) rotateX(17deg)}
+    50%{transform:translate3d(0,-49px,4px) rotateY(-1.3deg) rotateX(15.8deg)}
+  }
+
+  .vvv-camera.idle{animation:microFloat 7s ease-in-out infinite}
+
+  .replay{
+    position:absolute;
+    right:16px;
+    bottom:18px;
+    border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06);
+    color:rgba(255,255,255,.72);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    padding:9px 13px;
+    border-radius:999px;
+    font:600 12px/1 system-ui,sans-serif;
+    letter-spacing:.04em;
+    cursor:pointer;
+  }
+  .replay:hover{background:rgba(255,255,255,.1);color:white}
+
+  @media (max-width:760px){
+    .vvv-stage{height:340px;transform:scale(.78)}
+    .vvv-caption{bottom:-10px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .vvv-camera,.specular-sweep,.vvv-caption{animation:none!important}
+    .vvv-camera{transform:translate3d(0,-42px,0) rotateX(17deg)}
+    .vvv-caption{opacity:1}
+  }
+</style>
+</head>
+<body>
+<section class="vvv-wrap" aria-label="#VVv liquid glass 3D animation">
+  <div class="vvv-glow"></div>
+  <div class="vvv-stage">
+    <div class="vvv-camera" id="vvvCamera">
+      <div class="vvv-object" id="vvvObject"></div>
+      <div class="specular-sweep"></div>
+    </div>
+    <div class="vvv-caption">Venu · Vasavi · little v</div>
+    <button class="replay" id="replayBtn" type="button">Replay</button>
+  </div>
+</section>
+
+<script>
+(() => {
+  const object = document.getElementById('vvvObject');
+  const camera = document.getElementById('vvvCamera');
+  const replay = document.getElementById('replayBtn');
+
+  const letters = [
+    { char:'#', cls:'hash', size:166, y:163, family:'Georgia, Times New Roman, serif' },
+    { char:'V', cls:'', size:212, y:179, family:'Georgia, Times New Roman, serif' },
+    { char:'V', cls:'', size:212, y:179, family:'Georgia, Times New Roman, serif' },
+    { char:'v', cls:'smallv', size:170, y:150, family:'Georgia, Times New Roman, serif' }
+  ];
+
+  function defs(id){
+    return `
+    <defs>
+      <linearGradient id="side-${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#c7c9e3" stop-opacity=".18"/>
+        <stop offset=".42" stop-color="#6e668d" stop-opacity=".30"/>
+        <stop offset="1" stop-color="#171324" stop-opacity=".68"/>
+      </linearGradient>
+      <linearGradient id="glass-${id}" x1="0" y1="0" x2=".92" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity=".90"/>
+        <stop offset=".18" stop-color="#f3f4ff" stop-opacity=".46"/>
+        <stop offset=".52" stop-color="#b9b7dc" stop-opacity=".18"/>
+        <stop offset=".78" stop-color="#9c86d5" stop-opacity=".22"/>
+        <stop offset="1" stop-color="#5b476f" stop-opacity=".34"/>
+      </linearGradient>
+      <linearGradient id="rim-${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity=".94"/>
+        <stop offset=".38" stop-color="#d6e7ff" stop-opacity=".60"/>
+        <stop offset=".68" stop-color="#d9bfff" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity=".08"/>
+      </linearGradient>
+      <filter id="glassfx-${id}" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2.4" result="blur"/>
+        <feSpecularLighting in="blur" surfaceScale="7" specularConstant="1.15" specularExponent="24" lighting-color="#ffffff" result="spec">
+          <fePointLight x="-80" y="-95" z="180"/>
+        </feSpecularLighting>
+        <feComposite in="spec" in2="SourceAlpha" operator="in" result="specClip"/>
+        <feFlood flood-color="#6c52aa" flood-opacity=".14" result="tint"/>
+        <feComposite in="tint" in2="SourceAlpha" operator="in" result="tintClip"/>
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="tintClip"/>
+          <feMergeNode in="specClip"/>
+        </feMerge>
+      </filter>
+    </defs>`;
+  }
+
+  function svgFor(letter,index,kind){
+    const fill = kind === 'side' ? `url(#side-${index})` : `url(#glass-${index})`;
+    const stroke = kind === 'front' ? `url(#rim-${index})` : 'rgba(255,255,255,.05)';
+    const strokeWidth = kind === 'front' ? '1.45' : '.45';
+    const filter = kind === 'front' ? `filter="url(#glassfx-${index})"` : '';
+    return `
+      <svg viewBox="0 0 200 220" aria-hidden="true">
+        ${defs(index)}
+        <text x="100" y="${letter.y}" text-anchor="middle"
+              font-family="${letter.family}" font-weight="700" font-size="${letter.size}"
+              fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"
+              paint-order="stroke fill" ${filter}>${letter.char}</text>
+      </svg>`;
+  }
+
+  function makeGlyph(letter,index){
+    const el = document.createElement('div');
+    el.className = `glyph ${letter.cls}`.trim();
+
+    // back surface
+    const back = document.createElement('div');
+    back.className='back';
+    back.innerHTML=svgFor(letter,index,'side');
+    el.appendChild(back);
+
+    // 11 depth slices: enough to read as solid glass without looking duplicated.
+    for(let i=0;i<11;i++){
+      const s=document.createElement('div');
+      s.className='slice';
+      s.innerHTML=svgFor(letter,index,'side');
+      el.appendChild(s);
+    }
+
+    // premium front face
+    const face=document.createElement('div');
+    face.className='face';
+    face.innerHTML=svgFor(letter,index,'front');
+    el.appendChild(face);
+
+    return el;
+  }
+
+  letters.forEach((l,i)=>object.appendChild(makeGlyph(l,i)));
+
+  camera.addEventListener('animationend',(e)=>{
+    if(e.animationName==='cameraFly'){
+      camera.classList.add('idle');
+    }
+  });
+
+  replay.addEventListener('click',()=>{
+    camera.classList.remove('idle');
+    camera.style.animation='none';
+    void camera.offsetWidth;
+    camera.style.animation='';
+  });
+})();
+</script>
+</body>
+</html>

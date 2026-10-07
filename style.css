@@ -808,6 +808,146 @@ button.calendar-day:hover { background: #fff0f4; }
   font-weight: 300;
 }
 
+/* ===== INTERACTIVE FAMILY TREE ===== */
+.family-tree-section {
+  padding: 80px 20px;
+  text-align: center;
+  background: radial-gradient(ellipse at top, #fce8ef 0%, transparent 65%),
+              linear-gradient(150deg, #f9f6ff, #edf5f0);
+  color: #3b3450;
+}
+
+.family-tree-section [lang="te"] {
+  font-family: 'Noto Sans Telugu', sans-serif;
+  line-height: 1.8;
+}
+
+.tree-eyebrow {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: #72638c;
+  margin-bottom: 12px;
+}
+
+.family-tree-section h2 { font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: 14px; }
+.tree-intro { max-width: 580px; margin: 0 auto 12px; line-height: 1.7; }
+.tree-hint { font-size: .9rem; color: #635b73; margin-bottom: 20px; }
+.tree-toggle {
+  font: inherit;
+  font-size: .85rem;
+  color: #594477;
+  background: #fff;
+  border: 1px solid #cfc1df;
+  border-radius: 30px;
+  padding: 10px 22px;
+  cursor: pointer;
+}
+.tree-toggle:hover { background: #eee6f7; }
+.family-tree {
+  list-style: none;
+  padding: 0;
+  margin: 34px auto 0;
+  max-width: 680px;
+}
+.tree-generation { position: relative; padding: 0 0 52px; }
+.tree-generation:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 52px;
+  bottom: 0;
+  left: calc(50% - 1px);
+  background: linear-gradient(#bda8ce, #93b5a2);
+}
+.generation-label {
+  width: fit-content;
+  margin: 0 auto 12px;
+  padding: 5px 16px;
+  border-radius: 20px;
+  background: #eee8f3;
+  color: #665575;
+  font-size: .78rem;
+  font-weight: 500;
+}
+.tree-members {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 28px;
+  position: relative;
+}
+.tree-members::before {
+  content: '';
+  position: absolute;
+  height: 2px;
+  background: #bda8ce;
+  left: 25%;
+  right: 25%;
+  top: 49px;
+}
+.tree-person {
+  position: relative;
+  flex: 1;
+  max-width: 280px;
+  min-width: 0;
+  text-align: center;
+  background: rgba(255, 255, 255, .95);
+  border: 1px solid #dfd5e8;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(74, 49, 93, .07);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.tree-person:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(74, 49, 93, .13); }
+.tree-person summary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+  list-style: none;
+  padding: 18px 20px;
+  min-height: 102px;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+.tree-person summary::-webkit-details-marker { display: none; }
+.person-photo {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: cover;
+  object-position: center 25%;
+  border-radius: 50%;
+  border: 3px solid #eee6f5;
+  background: #f3edf8;
+  box-shadow: 0 3px 10px rgba(74, 49, 93, .12);
+}
+.tree-person summary > span[lang="te"] { min-width: 0; overflow-wrap: anywhere; }
+.person-cue { position: absolute; top: 10px; right: 14px; color: #83718e; font-size: 1rem; transition: transform .2s; }
+.tree-person[open] .person-cue { transform: rotate(45deg); }
+.remembrance { display: block; font: 400 .72rem/1.5 'Poppins', sans-serif; color: #74697f; margin-top: 5px; }
+.person-detail { padding: 0 16px 20px; font-size: .8rem; color: #665b72; line-height: 1.7; }
+.person-detail p:first-child { font-weight: 600; color: #51405f; margin-bottom: 6px; }
+.tree-person--remembered { background: #faf8fc; border-style: dashed; }
+.tree-person--baby { background: #fff0f5; border-color: #eab7ce; box-shadow: 0 8px 30px rgba(192, 97, 138, .13); }
+.tree-generation:last-child { padding-bottom: 0; }
+.tree-caption { margin-top: 30px; color: #78566e; font-size: 1.05rem; }
+.tree-person summary:focus-visible, .tree-toggle:focus-visible { outline: 3px solid #805aa5; outline-offset: 4px; }
+@media (max-width: 480px) {
+  .family-tree-section { padding: 60px 14px; }
+  .tree-members { gap: 16px; }
+  .tree-person summary { padding: 20px 8px 16px; font-size: 1rem; gap: 7px; }
+  .person-photo { width: 44px; height: 44px; border-width: 2px; }
+  .person-detail { padding: 0 10px 16px; font-size: .75rem; }
+  .remembrance { font-size: .65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tree-person, .person-cue { transition: none; }
+}
+
 /* ===== MESSAGES SECTION ===== */
 .messages-section {
   padding: 80px 20px;
@@ -887,6 +1027,8 @@ button.calendar-day:hover { background: #fff0f4; }
 }
 
 .timeline {
+  list-style: none;
+  padding: 0;
   max-width: 900px;
   margin: 0 auto;
   position: relative;
@@ -906,6 +1048,27 @@ button.calendar-day:hover { background: #fff0f4; }
   margin-bottom: 50px;
   position: relative;
 }
+.timeline-item:last-child { margin-bottom: 0; }
+.timeline-content {
+  position: relative;
+  padding: 22px;
+  border: 1px solid #ddd3ed;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(74, 49, 93, .08);
+}
+.timeline-content::before {
+  content: '';
+  position: absolute;
+  top: 30px;
+  height: 2px;
+  width: 11.2%;
+  background: #aa92c7;
+}
+.timeline-item:nth-child(odd) .timeline-content::before { left: 100%; }
+.timeline-item:nth-child(even) .timeline-content::before { right: 100%; }
+.timeline-item.active .timeline-content { background: #fff0f5; border-color: #eab7ce; }
+.timeline-content .timeline-note { margin-top: 10px; font-size: .85rem; line-height: 1.7; }
 
 .timeline-item:nth-child(odd) .timeline-content {
   margin-left: 0;
@@ -963,10 +1126,17 @@ button.calendar-day:hover { background: #fff0f4; }
   
   .timeline-item:nth-child(odd) .timeline-content,
   .timeline-item:nth-child(even) .timeline-content {
-    width: 100%;
-    padding-left: 70px;
-    padding-right: 0;
+    width: calc(100% - 70px);
+    margin-left: 70px;
+    margin-right: 0;
+    padding: 20px;
     text-align: left;
+  }
+  .timeline-item:nth-child(odd) .timeline-content::before,
+  .timeline-item:nth-child(even) .timeline-content::before {
+    left: auto;
+    right: 100%;
+    width: 50px;
   }
   
   .timeline-marker {

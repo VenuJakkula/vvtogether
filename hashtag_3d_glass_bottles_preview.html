@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>3D Glass Bottle Hashtag Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+  body {
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: radial-gradient(circle at 30% 20%, rgba(150,110,200,0.4), transparent 55%), linear-gradient(135deg, #3a2260 0%, #4a2e78 55%, #2c1a4d 100%);
+    padding: 50px 16px;
+    overflow-x: hidden;
+  }
+
+  .hashtag-evolve-section { text-align: center; color: #fff; max-width: 640px; }
+
+  .hashtag-evolve-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    margin-bottom: 6px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  }
+
+  .hashtag-evolve-section .subtitle {
+    font-size: 0.92rem;
+    opacity: 0.75;
+    margin-bottom: 50px;
+  }
+
+  /* ===== 3D STAGE ===== */
+  .hashtag-3d-stage {
+    perspective: 900px;
+    perspective-origin: 20% 30%;
+    padding: 40px 10px 20px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hashtag-3d-scene {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(10px, 3vw, 22px);
+    transform-style: preserve-3d;
+    transform-origin: 12% 55%;
+    will-change: transform;
+  }
+
+  .hashtag-3d-scene.is-intro { animation: cameraIntro 3.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .hashtag-3d-scene.is-idle  { animation: idleFloat 7s ease-in-out infinite; }
+
+  @keyframes cameraIntro {
+    0%   { transform: rotateY(80deg) rotateX(2deg)  translateX(-34%); opacity: 0; }
+    8%   { opacity: 1; }
+    50%  { transform: rotateY(38deg) rotateX(22deg) translateX(-10%); }
+    100% { transform: rotateY(0deg)  rotateX(38deg) translateX(0%); }
+  }
+
+  @keyframes idleFloat {
+    0%, 100% { transform: rotateY(0deg) rotateX(38deg) translateY(0); }
+    50%      { transform: rotateY(3deg) rotateX(33deg) translateY(-3px); }
+  }
+
+  /* ===== EACH GLASS LETTER (volumetric block) ===== */
+  .letter3d {
+    position: relative;
+    width: clamp(58px, 16vw, 94px);
+    height: clamp(84px, 23vw, 132px);
+    transform-style: preserve-3d;
+    opacity: 0;
+    filter: drop-shadow(0 16px 22px rgba(15, 6, 35, 0.45));
+    animation: letterSettle 0.75s ease-out forwards;
+    animation-delay: var(--settle-delay, 0s);
+  }
+
+  @keyframes letterSettle {
+    0%   { opacity: 0; transform: rotateY(var(--tilt, 0deg)) translateY(16px) scale(0.88); }
+    100% { opacity: 1; transform: rotateY(var(--tilt, 0deg)) translateY(0) scale(1); }
+  }
+
+  .letter3d--new {
+    transform: rotateY(var(--tilt, 0deg)) scale(0.68) !important;
+    opacity: 0.5 !important;
+  }
+
+  .hashtag-3d-stage.is-revealed .letter3d--new {
+    animation: newLetterPour 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes newLetterPour {
+    0%   { transform: rotateY(var(--tilt, 0deg)) scale(0.68); opacity: 0.5; }
+    55%  { transform: rotateY(var(--tilt, 0deg)) scale(1.1);  opacity: 1; }
+    100% { transform: rotateY(var(--tilt, 0deg)) scale(1);    opacity: 1; }
+  }
+
+  .depth-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    backface-visibility: hidden;
+  }
+
+  .liquid-level { transition: transform 1.2s cubic-bezier(0.33, 1, 0.5, 1); }
+
+  .layer-front-overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .glass-shine { animation: shineSweep 4s ease-in-out infinite; animation-delay: var(--shine-delay, 0s); }
+
+  @keyframes shineSweep {
+    0%   { transform: skewX(-16deg) translateX(-50px); opacity: 0; }
+    10%  { opacity: 0.8; }
+    34%  { transform: skewX(-16deg) translateX(220px); opacity: 0; }
+    100% { transform: skewX(-16deg) translateX(220px); opacity: 0; }
+  }
+
+  .droplet {
+    position: absolute;
+    top: -6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #fff, #cbb2ff 70%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50;
+    animation: dropletFall 0.75s ease-in forwards;
+  }
+
+  @keyframes dropletFall {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(80px) scale(0.4); }
+  }
+
+  .hashtag-caption { margin-top: 30px; font-size: 0.95rem; letter-spacing: 0.03em; opacity: 0.9; min-height: 1.4em; }
+  .hashtag-hint { font-size: 0.78rem; opacity: 0.55; margin-top: -4px; }
+</style>
+</head>
+<body>
+
+<!-- Shared clip-path definitions, one per letter, referenced by every depth layer -->
+<svg width="0" height="0" style="position:absolute;" aria-hidden="true">
+  <defs id="letterDefs"></defs>
+</svg>
+
+<section class="hashtag-evolve-section">
+  <h2>#VV becomes #VVv</h2>
+  <p class="subtitle">Tap the glass and watch it fill ✨</p>
+
+  <div class="hashtag-3d-stage" id="hashtagStage">
+    <div class="hashtag-3d-scene is-intro" id="hashtagScene"></div>
+  </div>
+
+  <p class="hashtag-caption" id="hashtagCaption">Tap to pour the little "v" in</p>
+  <p class="hashtag-hint">Venu &nbsp;+&nbsp; Vasavi &nbsp;+&nbsp; our little one</p>
+</section>
+
+<script>
+(() => {
+  const LETTERS = [
+    { ch: '#', tilt: -16, fillEmpty: 170, fillFull: 100, isNew: false },
+    { ch: 'V', tilt: -7,  fillEmpty: 170, fillFull: 82,  isNew: false },
+    { ch: 'V', tilt: 5,   fillEmpty: 170, fillFull: 88,  isNew: false },
+    { ch: 'v', tilt: 15,  fillEmpty: 170, fillFull: 40,  isNew: true  }
+  ];
+
+  const LAYERS = 12;           // number of stacked depth slices per letter
+  const Z_STEP = 2.4;          // px between each slice -> total ~29px of glass thickness
+  const GLASS_FRONT = [255,255,255], GLASS_BACK = [120, 82, 168];
+  const LIQUID_FRONT = [224,198,255], LIQUID_BACK = [64, 32, 104];
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function mix(c1, c2, t) {
+    return `${Math.round(lerp(c1[0], c2[0], t))},${Math.round(lerp(c1[1], c2[1], t))},${Math.round(lerp(c1[2], c2[2], t))}`;
+  }
+
+  const defs = document.getElementById('letterDefs');
+  const scene = document.getElementById('hashtagScene');
+  const stage = document.getElementById('hashtagStage');
+  const caption = document.getElementById('hashtagCaption');
+
+  LETTERS.forEach((letter, idx) => {
+    const fontSize = letter.ch === '#' ? 96 : 132;
+    defs.insertAdjacentHTML('beforeend', `
+      <clipPath id="letterClip-${idx}" clipPathUnits="userSpaceOnUse">
+        <text x="60" y="128" font-family="'Playfair Display', serif" font-weight="700"
+              font-size="${fontSize}" text-anchor="middle">${letter.ch}</text>
+      </clipPath>
+    `);
+  });
+
+  function buildLetter(letter, idx) {
+    const el = document.createElement('div');
+    el.className = 'letter3d' + (letter.isNew ? ' letter3d--new' : '');
+    el.style.setProperty('--tilt', letter.tilt + 'deg');
+    el.style.setProperty('--settle-delay', (0.16 * idx) + 's');
+    el.dataset.idx = idx;
+    el.dataset.fillEmpty = letter.fillEmpty;
+    el.dataset.fillFull = letter.fillFull;
+
+    let layersHtml = '';
+    for (let i = 0; i < LAYERS; i++) {
+      const t = i / (LAYERS - 1);
+      const z = (LAYERS - 1 - i) * Z_STEP; // i=0 is front-most (largest z)
+      const glassColor = `rgba(${mix(GLASS_FRONT, GLASS_BACK, t)},${lerp(0.28, 0.55, t)})`;
+      const liquidColor = `rgba(${mix(LIQUID_FRONT, LIQUID_BACK, t)},${lerp(0.82, 0.97, t)})`;
+      const startY = letter.isNew ? letter.fillEmpty : letter.fillFull;
+
+      layersHtml += `
+        <svg class="depth-layer" viewBox="0 0 120 170" preserveAspectRatio="none"
+             style="transform: translateZ(${z}px);">
+          <rect x="0" y="0" width="120" height="170" clip-path="url(#letterClip-${idx})" fill="${glassColor}"/>
+          <g class="liquid-level" data-layer="${i}" style="transform: translateY(${startY}px);">
+            <rect x="-10" y="0" width="140" height="320" clip-path="url(#letterClip-${idx})" fill="${liquidColor}"/>
+          </g>
+        </svg>
+      `;
+    }
+
+    const overlayZ = LAYERS * Z_STEP + 3;
+    const overlayHtml = `
+      <svg class="layer-front-overlay" viewBox="0 0 120 170" preserveAspectRatio="none"
+           style="transform: translateZ(${overlayZ}px);">
+        <rect class="glass-shine" x="-70" y="0" width="34" height="170"
+              clip-path="url(#letterClip-${idx})" fill="rgba(255,255,255,0.65)"
+              transform="skewX(-16)" style="--shine-delay:${idx * 0.4}s;"/>
+        <text x="60" y="128" font-family="'Playfair Display', serif" font-weight="700"
+              font-size="${letter.ch === '#' ? 96 : 132}" text-anchor="middle"
+              fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"></text>
+      </svg>
+    `;
+
+    el.innerHTML = layersHtml + overlayHtml;
+    return el;
+  }
+
+  LETTERS.forEach((letter, idx) => scene.appendChild(buildLetter(letter, idx)));
+
+  scene.addEventListener('animationend', (e) => {
+    if (e.target === scene && e.animationName === 'cameraIntro') {
+      scene.classList.remove('is-intro');
+      scene.classList.add('is-idle');
+    }
+  });
+
+  let revealed = false;
+
+  function spawnDroplets(letterEl) {
+    for (let i = 0; i < 5; i++) {
+      const d = document.createElement('span');
+      d.className = 'droplet';
+      d.style.left = (28 + Math.random() * 44) + '%';
+      d.style.animationDelay = (i * 0.08) + 's';
+      letterEl.appendChild(d);
+      setTimeout(() => d.remove(), 900);
+    }
+  }
+
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+    stage.classList.add('is-revealed');
+    const newLetterEl = scene.querySelector('.letter3d--new');
+    newLetterEl.querySelectorAll('.liquid-level').forEach((g) => {
+      g.style.transform = `translateY(${newLetterEl.dataset.fillFull}px)`;
+    });
+    spawnDroplets(newLetterEl);
+    caption.textContent = '#VVv — welcoming our little one';
+  }
+
+  stage.addEventListener('click', reveal);
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setTimeout(reveal, 3400);
+          io.disconnect();
+        }
+      });
+    }, { threshold: 0.6 });
+    io.observe(stage);
+  }
+})();
+</script>
+
+</body>
+</html>
