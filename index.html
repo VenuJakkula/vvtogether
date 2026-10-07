@@ -274,33 +274,34 @@
     </ol>
   </section>
 
-  <!-- Life with Our Little Girl -->
-  <section class="preparation-section">
-    <div class="section-icon animated-wiggle">🏡</div>
-    <h2>Life with Our Little Girl</h2>
+  <!-- Our Little Blessing -->
+  <section class="preparation-section blessing-section" lang="te" aria-labelledby="blessing-title">
+    <div class="section-icon" aria-hidden="true">🪷</div>
+    <h2 id="blessing-title">మా ఇంట అడుగుపెట్టిన చిన్నారి మహాలక్ష్మి</h2>
+    <p class="blessing-intro">శుక్రవారం పుట్టిన మా బంగారు తల్లి… మా జీవితాల్లో వెలుగులు నింపిన దైవానుగ్రహం.</p>
     <div class="prep-content">
       <div class="prep-item">
-        <span class="prep-emoji">🛏️</span>
-        <h3>Nursery Setup</h3>
-        <p>A cozy space filled with love for our little girl</p>
+        <span class="prep-emoji" aria-hidden="true">🪔</span>
+        <h3>శుక్రవారం… శుభోదయం</h3>
+        <p>అక్టోబర్ 2, 2026, శుక్రవారం మధ్యాహ్నం 12:11 గంటలకు మా చిన్నారి జన్మించింది. ఆ శుభక్షణం మా ఇంటికి ఆనందాన్ని, మా హృదయాలకు దివ్యమైన అనుభూతిని అందించింది.</p>
       </div>
       
       <div class="prep-item">
-        <span class="prep-emoji">📚</span>
-        <h3>Learning Together</h3>
-        <p>Discovering the joys of parenthood, one day at a time</p>
+        <span class="prep-emoji" aria-hidden="true">🪷</span>
+        <h3>మహాలక్ష్మి రూపమా!</h3>
+        <p>ఆమెను చూస్తుంటే మహాలక్ష్మి అమ్మవారే మా పాప రూపంలో వచ్చిందేమో అనిపిస్తోంది. మా ఒడిలో చేరిన ఈ చిన్న ప్రాణం, మా కుటుంబానికి లభించిన అపురూపమైన దైవానుగ్రహంగా భావిస్తున్నాం.</p>
       </div>
       
       <div class="prep-item">
-        <span class="prep-emoji">👶</span>
-        <h3>Baby Essentials</h3>
-        <p>Keeping our little girl cozy, comfortable, and loved</p>
+        <span class="prep-emoji" aria-hidden="true">✨</span>
+        <h3>నాన్నకు కొత్త ధైర్యం</h3>
+        <p>నా జీవితంలోని అడ్డంకుల నుంచి నన్ను కాపాడటానికి, నా దారిలో వెలుగు నింపటానికి నా బంగారు తల్లి వచ్చిందనిపిస్తోంది. ఆమె రాకతో నాలో కొత్త ఆశ, ప్రతి కష్టాన్ని ఎదుర్కొనే ధైర్యం పుట్టాయి.</p>
       </div>
       
       <div class="prep-item">
-        <span class="prep-emoji">🏥</span>
-        <h3>Medical Care</h3>
-        <p>Caring for our daughter as she grows</p>
+        <span class="prep-emoji" aria-hidden="true">💕</span>
+        <h3>మా చిన్నారికి మీ దీవెనలు</h3>
+        <p>మా ఇంటి వెలుగు, మా హృదయాల ఆనందం అయిన ఈ చిన్నారి ఆయురారోగ్యాలతో, సంతోషంతో ఎదగాలని మనసారా కోరుకుంటున్నాం. మీ ప్రేమ, ఆశీర్వాదాలు ఆమెకు ఎల్లప్పుడూ తోడుగా ఉండాలి.</p>
       </div>
     </div>
   </section>
@@ -412,5 +413,12 @@
     })();
   </script>
 
+  <div class="scroll-balloon" id="scrollBalloon" aria-hidden="true">
+    <div class="balloon-body"><span>💕</span></div>
+    <div class="balloon-string"></div>
+  </div>
+  <canvas class="celebration-canvas" id="celebrationCanvas" aria-hidden="true" hidden></canvas>
+  <p class="celebration-status" id="celebrationStatus" role="status"></p>
+  <script src="celebration.js"></script>
 </body>
 </html>

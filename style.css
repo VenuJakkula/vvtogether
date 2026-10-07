@@ -11,6 +11,75 @@ body {
   line-height: 1.6;
 }
 
+.scroll-balloon {
+  position: fixed;
+  top: 0;
+  right: 20px;
+  width: 64px;
+  height: 152px;
+  z-index: 1001;
+  pointer-events: none;
+  will-change: transform;
+}
+.scroll-balloon[hidden], .celebration-canvas[hidden] { display: none; }
+.balloon-body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 82px;
+  border-radius: 50% 50% 46% 46%;
+  background: radial-gradient(circle at 28% 24%, #fff0f6, #f495bd 35%, #d95296 80%);
+  box-shadow: inset -6px -8px 12px rgba(140, 31, 90, .2), 0 5px 16px rgba(173, 57, 114, .2);
+  transform-origin: center;
+}
+.balloon-body span { font-size: 22px; }
+.balloon-body::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 8px solid #d95296;
+}
+.balloon-string {
+  width: 15px;
+  height: 64px;
+  margin: 7px auto 0;
+  border-left: 1px solid #a97d94;
+  border-radius: 50%;
+}
+.scroll-balloon--popped .balloon-body { animation: balloon-pop .28s ease-out forwards; }
+.scroll-balloon--popped .balloon-string { opacity: 0; }
+@keyframes balloon-pop {
+  45% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1.65); opacity: 0; }
+}
+.celebration-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1002;
+  pointer-events: none;
+}
+.celebration-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (max-width: 480px) {
+  .scroll-balloon { right: 8px; width: 44px; height: 115px; }
+  .balloon-body { width: 44px; height: 58px; }
+  .balloon-body span { font-size: 17px; }
+  .balloon-string { height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-balloon--popped .balloon-body { animation: none; opacity: 0; }
+}
+
 html {
   scroll-padding-top: 90px;
 }
@@ -1205,6 +1274,28 @@ button.calendar-day:hover { background: #fff0f4; }
   font-size: 0.95rem;
   line-height: 1.6;
 }
+
+.blessing-section {
+  font-family: 'Noto Sans Telugu', sans-serif;
+  background: radial-gradient(ellipse at top, #ffe5c0, transparent 65%),
+              linear-gradient(135deg, #fff8ed, #fce8ef);
+}
+.blessing-section h2 {
+  color: #79465a;
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+.blessing-intro {
+  max-width: 760px;
+  margin: 0 auto 40px;
+  color: #765d54;
+  line-height: 2;
+  font-size: 1.05rem;
+}
+.blessing-section .prep-item { background: rgba(255, 255, 255, .8); border-color: #ead2bc; }
+.blessing-section .prep-item h3 { color: #79465a; line-height: 1.9; text-shadow: none; }
+.blessing-section .prep-item p { color: #62504b; line-height: 2; }
 
 /* ===== STAY CONNECTED SECTION ===== */
 .stay-connected-section {
