@@ -5,6 +5,87 @@
   font-family: 'Poppins', sans-serif;
 }
 
+.name-reveal-launcher {
+  position: fixed;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: 20px;
+  z-index: 1003;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid #f8c6de;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff8fc, #f5eaff);
+  color: #843660;
+  box-shadow: 0 8px 30px rgba(106, 39, 99, .22);
+  cursor: pointer;
+  text-align: left;
+}
+.name-reveal-launcher strong, .name-reveal-launcher small { display: block; }
+.name-reveal-launcher small { margin-top: 3px; font-size: .72rem; }
+.name-reveal-gift { font-size: 30px; animation: reveal-gift 3s ease-in-out infinite; }
+@keyframes reveal-gift {
+  0%, 70%, 100% { transform: rotate(0); }
+  76% { transform: rotate(-10deg); }
+  84% { transform: rotate(10deg); }
+  92% { transform: rotate(-5deg); }
+}
+.name-reveal-launcher:focus-visible, .name-reveal-close:focus-visible { outline: 3px solid #9450b0; outline-offset: 4px; }
+body.name-reveal-open { overflow: hidden; }
+.name-reveal-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 36px 28px;
+  border: 1px solid #f4c8df;
+  border-radius: 28px;
+  background: linear-gradient(150deg, #fff9fc, #f5edff);
+  color: #56364e;
+  text-align: center;
+  box-shadow: 0 24px 90px rgba(40, 16, 52, .25);
+}
+.name-reveal-dialog::backdrop { background: rgba(34, 18, 45, .6); backdrop-filter: blur(5px); }
+.name-reveal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: #f4e2ee;
+  color: #843660;
+  font-size: 26px;
+  cursor: pointer;
+}
+.name-reveal-dialog-gift { font-size: 44px; }
+.name-reveal-eyebrow { font-size: .65rem; letter-spacing: 1.5px; margin: 12px 0; color: #96567b; }
+.name-reveal-dialog h2 { font-family: 'Playfair Display', serif; font-size: 2rem; line-height: 1.25; margin-bottom: 16px; }
+#nameRevealDescription { font-size: .9rem; }
+.name-reveal-countdown { margin: 24px 0; padding: 16px; background: white; border-radius: 18px; }
+.name-reveal-countdown strong { display: block; font-size: 2.8rem; line-height: 1.2; color: #ad487e; }
+.name-reveal-countdown span { font-size: .8rem; }
+.name-reveal-timeline { list-style: none; text-align: left; }
+.name-reveal-timeline li { display: flex; gap: 14px; padding-bottom: 22px; }
+.name-reveal-timeline li > span { display: grid; place-items: center; flex: 0 0 36px; height: 36px; background: white; border-radius: 50%; }
+.name-reveal-timeline time, .name-reveal-timeline-date { font-size: .75rem; color: #96567b; }
+.name-reveal-timeline h3 { font-size: .95rem; margin: 4px 0; }
+.name-reveal-timeline li div > p:last-child { font-size: .8rem; color: #77596d; }
+.name-reveal-footer { font-size: .8rem; color: #96567b; }
+@media (max-width: 480px) {
+  .name-reveal-launcher { left: 12px; padding: 10px 12px; gap: 8px; }
+  .name-reveal-launcher strong { font-size: .8rem; }
+  .name-reveal-gift { font-size: 25px; }
+  .name-reveal-dialog { padding: 36px 20px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .name-reveal-gift { animation: none; }
+}
+
 body {
   color: #333;
   background-color: #fff;

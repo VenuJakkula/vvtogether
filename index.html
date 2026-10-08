@@ -369,6 +369,26 @@
   </div>
   <canvas class="celebration-canvas" id="celebrationCanvas" aria-hidden="true" hidden></canvas>
   <p class="celebration-status" id="celebrationStatus" role="status"></p>
+  <button class="name-reveal-launcher" id="nameRevealLauncher" type="button" aria-haspopup="dialog" aria-controls="nameRevealDialog">
+    <span class="name-reveal-gift" aria-hidden="true">🎁</span>
+    <span><strong>A little secret…</strong><small>Name reveal · Nov 1</small></span>
+  </button>
+
+  <dialog class="name-reveal-dialog" id="nameRevealDialog" aria-labelledby="nameRevealTitle" aria-describedby="nameRevealDescription">
+    <button class="name-reveal-close" type="button" aria-label="Close name reveal timeline" autofocus>×</button>
+    <div class="name-reveal-dialog-gift" aria-hidden="true">🎀</div>
+    <p class="name-reveal-eyebrow">ONE LITTLE GIRL. ONE BEAUTIFUL SECRET.</p>
+    <h2 id="nameRevealTitle">Her name is worth the wait 💕</h2>
+    <p id="nameRevealDescription">Our first wedding anniversary comes with the sweetest surprise: our baby girl’s name!</p>
+    <div class="name-reveal-countdown"><strong id="nameRevealDays">24</strong><span id="nameRevealCountdownLabel">days until her name reveal</span></div>
+    <ol class="name-reveal-timeline" aria-label="Baby name reveal timeline">
+      <li><span aria-hidden="true">👶</span><div><time datetime="2026-10-02">October 2, 2026</time><h3>Our little girl arrived</h3><p>Our hearts found a whole new kind of love.</p></div></li>
+      <li><span aria-hidden="true">🤫</span><div><p class="name-reveal-timeline-date">Until our anniversary</p><h3>A little mystery to cherish</h3><p>Keep your guesses ready, family! Her name stays our sweet little secret.</p></div></li>
+      <li><span aria-hidden="true">🎉</span><div><time datetime="2026-11-01">November 1, 2026</time><h3>Our anniversary. Her name reveal.</h3><p>One year of marriage, a lifetime of love, and a beautiful name to share.</p></div></li>
+    </ol>
+    <p class="name-reveal-footer">A tiny name. A big celebration. Save the date! ✨</p>
+  </dialog>
+  <script src="name-reveal.js"></script>
   <script src="celebration.js"></script>
 </body>
 </html>
