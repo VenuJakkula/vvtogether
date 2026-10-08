@@ -490,7 +490,8 @@ button.calendar-day:hover { background: #fff0f4; }
 /* ===== BABY ANNOUNCEMENT PAGE ===== */
 .baby-hero {
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
+  padding: 60px 20px;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%),
               url('photos/rebranded.jpeg') center 15% / cover no-repeat;
   background-attachment: fixed;
@@ -595,6 +596,57 @@ button.calendar-day:hover { background: #fff0f4; }
   font-size: 4rem;
   margin-top: 30px;
   animation: bounce 2s infinite;
+}
+
+.hero-scroll-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 32px auto 0;
+  padding: 8px 16px;
+  color: white;
+  text-decoration: none;
+  font-size: .8rem;
+  letter-spacing: 1px;
+  border-radius: 16px;
+}
+.hero-scroll-cue:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+.scroll-mouse {
+  display: flex;
+  justify-content: center;
+  width: 25px;
+  height: 38px;
+  padding-top: 7px;
+  border: 2px solid rgba(255, 255, 255, .85);
+  border-radius: 16px;
+}
+.scroll-mouse span {
+  width: 4px;
+  height: 7px;
+  background: white;
+  border-radius: 4px;
+  animation: scroll-wheel 1.8s ease-in-out infinite;
+}
+.scroll-chevron {
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(45deg);
+  animation: scroll-chevron 1.8s ease-in-out infinite;
+}
+@keyframes scroll-wheel {
+  0%, 100% { transform: translateY(0); opacity: .3; }
+  50% { transform: translateY(10px); opacity: 1; }
+}
+@keyframes scroll-chevron {
+  0%, 100% { transform: translateY(0) rotate(45deg); opacity: .4; }
+  50% { transform: translateY(5px) rotate(45deg); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-mouse span, .scroll-chevron { animation: none; }
 }
 
 @keyframes bounce {
@@ -952,6 +1004,21 @@ button.calendar-day:hover { background: #fff0f4; }
   color: #665575;
   font-size: .78rem;
   font-weight: 500;
+}
+
+.hero-content-baby .countdown-timer {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 720px;
+  margin: 32px auto 0;
+}
+.hero-content-baby .countdown-value,
+.hero-content-baby .countdown-label { color: white; }
+@media (max-width: 600px) {
+  .hero-content-baby .countdown-timer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .hero-content-baby .countdown-item { padding: 16px 12px; }
 }
 .tree-members {
   display: flex;

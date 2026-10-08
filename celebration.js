@@ -79,23 +79,24 @@
     scrollFrame = 0;
     if (popped) return;
     const photo = celebration.querySelector('img').getBoundingClientRect();
-    const targetY = photo.top + photo.height / 2;
+    const section = celebration.getBoundingClientRect();
+    const targetY = section.top;
     const targetScroll = Math.max(0, window.scrollY + targetY - window.innerHeight * .55);
     const progress = targetScroll > 0 ? Math.max(0, Math.min(1, window.scrollY / targetScroll)) : 1;
     const top = Math.min(100, window.innerHeight * .2);
     const bottom = Math.max(top, window.innerHeight - balloon.offsetHeight - 16);
     const y = reducedMotion.matches ? top : top + (bottom - top) * progress;
     balloon.style.transform = `translateY(${y}px)`;
-    if (targetY <= window.innerHeight * .55 && photo.bottom > 0) {
+    const balloonBody = balloon.querySelector('.balloon-body').getBoundingClientRect();
+    if (balloonBody.bottom >= targetY && section.bottom > 0) {
       popped = true;
       const x = photo.left + photo.width / 2;
-      const y = Math.max(0, targetY - balloon.querySelector('.balloon-body').offsetHeight / 2);
+      const burstY = balloonBody.top + balloonBody.height / 2;
       balloon.style.left = `${x - balloon.offsetWidth / 2}px`;
       balloon.style.right = 'auto';
-      balloon.style.transform = `translateY(${y}px)`;
       balloon.classList.add('scroll-balloon--popped');
       status.textContent = 'Celebrating our baby girl!';
-      burstConfetti({ x, y: targetY });
+      burstConfetti({ x, y: burstY });
       window.setTimeout(() => { balloon.hidden = true; }, 300);
       window.removeEventListener('scroll', scheduleUpdate);
       window.removeEventListener('resize', scheduleUpdate);
