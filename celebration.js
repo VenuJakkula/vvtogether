@@ -2,11 +2,13 @@
   const balloon = document.getElementById('scrollBalloon');
   const canvas = document.getElementById('celebrationCanvas');
   const status = document.getElementById('celebrationStatus');
+  const celebration = document.getElementById('baby-hand-celebration');
+  if (!balloon || !canvas || !status || !celebration) return;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let popped = false;
   let scrollFrame = 0;
 
-  function burstConfetti() {
+  function burstConfetti(origin) {
     if (reducedMotion.matches) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -23,15 +25,14 @@
     }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    // Two party cannons fire from opposite corners across the whole viewport.
+    // Confetti bursts from the balloon over the baby-hand photo.
     const particles = Array.from({ length: 220 }, (_, i) => {
-      const fromLeft = i % 2 === 0;
-      const angle = (25 + Math.random() * 55) * Math.PI / 180;
-      const speed = 650 + Math.random() * 650;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 250 + Math.random() * 550;
       return {
-        x: fromLeft ? 0 : width,
-        y: height * (.85 + Math.random() * .15),
-        vx: Math.cos(angle) * speed * (fromLeft ? 1 : -1),
+        x: origin.x,
+        y: origin.y,
+        vx: Math.cos(angle) * speed,
         vy: -Math.sin(angle) * speed,
         size: 5 + Math.random() * 7,
         rotation: Math.random() * Math.PI,
@@ -77,17 +78,24 @@
   function updateBalloon() {
     scrollFrame = 0;
     if (popped) return;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = maxScroll > 0 ? Math.max(0, Math.min(1, window.scrollY / maxScroll)) : 0;
+    const photo = celebration.querySelector('img').getBoundingClientRect();
+    const targetY = photo.top + photo.height / 2;
+    const targetScroll = Math.max(0, window.scrollY + targetY - window.innerHeight * .55);
+    const progress = targetScroll > 0 ? Math.max(0, Math.min(1, window.scrollY / targetScroll)) : 1;
     const top = Math.min(100, window.innerHeight * .2);
     const bottom = Math.max(top, window.innerHeight - balloon.offsetHeight - 16);
     const y = reducedMotion.matches ? top : top + (bottom - top) * progress;
     balloon.style.transform = `translateY(${y}px)`;
-    if (maxScroll > 0 && maxScroll - window.scrollY <= 12) {
+    if (targetY <= window.innerHeight * .55 && photo.bottom > 0) {
       popped = true;
+      const x = photo.left + photo.width / 2;
+      const y = Math.max(0, targetY - balloon.querySelector('.balloon-body').offsetHeight / 2);
+      balloon.style.left = `${x - balloon.offsetWidth / 2}px`;
+      balloon.style.right = 'auto';
+      balloon.style.transform = `translateY(${y}px)`;
       balloon.classList.add('scroll-balloon--popped');
       status.textContent = 'Celebrating our baby girl!';
-      burstConfetti();
+      burstConfetti({ x, y: targetY });
       window.setTimeout(() => { balloon.hidden = true; }, 300);
       window.removeEventListener('scroll', scheduleUpdate);
       window.removeEventListener('resize', scheduleUpdate);
